@@ -91,7 +91,7 @@ const User = () => {
                         return <div className='flex justify-between mt-2 p-2 border border-purple text-purple bg-light-purple rounded-md' >
                             <div className='flex gap-2'>
                                 <p>{skill.name}</p>
-                                <p className='text-xs text-black px-1 rounded-md h-fit bg-white border'>categoria</p>
+                                <p className='text-xs text-black px-1 rounded-md h-fit bg-white border'>{skill.category.name}</p>
                             </div>
                             <div className='flex gap-4'>
                                 <Pencil className='text-yellow-500 cursor-pointer'/>
