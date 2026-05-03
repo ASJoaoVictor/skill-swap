@@ -11,7 +11,7 @@ const Register  = () => {
                 <p className='text-xl font-bold'>Bem-vindo</p>
             </div>
             <div>            
-                <form action="" method="post">
+                <form action="https://stunning-barnacle-jj75qw6qjq54cp64j-3000.app.github.dev/register" method="post">
                     <label htmlFor="name">Nome</label><br />
                     <input className="bg-gray-200 px-2 w-60 h-10 rounded-lg" type="text" name="name" id="name" placeholder="Seu nome"/><br />
 

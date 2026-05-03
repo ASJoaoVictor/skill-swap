@@ -4,47 +4,108 @@ import Card from "../components/Card";
 const Index = () => {
 
     const users = [
-      {
-        "nome": "Luana",
-        "habilidades_oferecidas": [
-          "Violão",
-          "Programação",
-          "React",
-          "HTML",
-          "CSS",
-          "Java",
-          "PHP",
-          "Python",
-        ],
-        "habilidades_procuradas": [
-          "Inglês",
-          "Cálculo I",
+    {
+        "id": 1,
+        "email": "teste@gmail.com",
+        "url_img": null,
+        "username": "teste",
+        "password": "12345",
+        "skills": [
+            {
+                "id": 1,
+                "name": "Piano",
+                "description": "teste",
+                "type": "offered",
+                "usersId": 1,
+                "categoryId": 1,
+                "category": {
+                    "id": 1,
+                    "name": "Música"
+                }
+            },
+            {
+                "id": 1,
+                "name": "Guitarra",
+                "description": "teste",
+                "type": "offered",
+                "usersId": 1,
+                "categoryId": 1,
+                "category": {
+                    "id": 1,
+                    "name": "Música"
+                }
+            },
+            {
+                "id": 1,
+                "name": "Inglês",
+                "description": "teste",
+                "type": "sought",
+                "usersId": 1,
+                "categoryId": 1,
+                "category": {
+                    "id": 1,
+                    "name": "Música"
+                }
+            }
         ]
-      },
-      {
-        "nome": "Pedro",
-        "habilidades_oferecidas": [
-          "Violão",
-          "Cálculo I",
-          "Inglês",
-        ],
-        "habilidades_procuradas": [
-          "React",
-          "Java",
+    },
+    {
+        "id": 1,
+        "email": "teste@gmail.com",
+        "url_img": null,
+        "username": "teste",
+        "password": "12345",
+        "skills": [
+            {
+                "id": 1,
+                "name": "Piano",
+                "description": "teste",
+                "type": "offered",
+                "usersId": 1,
+                "categoryId": 1,
+                "category": {
+                    "id": 1,
+                    "name": "Música"
+                }
+            },
+            {
+                "id": 1,
+                "name": "Guitarra",
+                "description": "teste",
+                "type": "offered",
+                "usersId": 1,
+                "categoryId": 1,
+                "category": {
+                    "id": 1,
+                    "name": "Música"
+                }
+            },
+            {
+                "id": 1,
+                "name": "Inglês",
+                "description": "teste",
+                "type": "sought",
+                "usersId": 1,
+                "categoryId": 1,
+                "category": {
+                    "id": 1,
+                    "name": "Música"
+                }
+            }
         ]
-      },
-    ]
+    }
+]
 
     return  <div className='bg-light-purple min-h-screen h-full'>
       <Header />
       <main className='flex-1 h-full'>
         <div className='grid grid-cols-3 max-w-325 m-auto'>
-          {users.map((user, index) => 
+          {users.map((user) => 
             <Card 
-              key={index} 
-              name={user.nome} 
-              habilidades_oferecidas={user.habilidades_oferecidas}
-              habilidades_procuradas={user.habilidades_procuradas}
+              key={user.id} 
+              name={user.username} 
+              habilidades_oferecidas={user.skills.filter((skill) => skill.type === "offered")}
+              habilidades_procuradas={user.skills.filter((skill) => skill.type === "sought")}
             />)
             }
         </div>
