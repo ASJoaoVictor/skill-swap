@@ -39,7 +39,7 @@ router.get("/get", async (req, res) => {
     try{
         const userData = await prisma.users.findUnique({
             where: {
-                id: 1
+                id: currentUser.id
             },
             include: {
                 skills: {

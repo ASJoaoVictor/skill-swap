@@ -18,11 +18,19 @@ router.post("/add", async (req, res) => {
                 name: name,
                 description: description,
                 type: type,
-                usersId: currentUser.id,
-                categoryId: Number(categoryId)
+                users: {
+                    connect: {
+                        id: currentUser.id
+                    }
+                },
+                category: {
+                    connect: {
+                        id: Number(categoryId)
+                    }
+                }
             }
         });
-        res.status(201).json({message: "deu certo"});
+        res.status(201).json(skill);
     }catch(err){
         console.log(err);
         res.status(400).send("Erro ao adicionar habilidade!")
