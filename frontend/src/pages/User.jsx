@@ -1,63 +1,38 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Header from '../components/Header';
 import { Trash, Pencil, Plus } from 'lucide-react';
 import ModalConfirm from '../components/ModalConfirm';
 import ModalAddSkill from '../components/ModalAddSkill';
 import ModalEditSkill from '../components/ModalEditSkill';
+import api from '../services/api';
 
 const User = () => {
 
+    const [user, setUser] = useState(null);
     const [skillDelete, setSkillDelete] = useState(null);
     const [modalAddSkillOffered, setModalAddSkillOffered] = useState(null);
     const [modalAddSkillSought, setModalAddSkillSought] = useState(null);
     const [modalEditSkillOffered, setModalEditSkillOffered] = useState(null)
     const [modalEditSkillSought, setModalEditSkillSought] = useState(null)
 
-    const user = {
-        "id": 1,
-        "email": "teste@gmail.com",
-        "url_img": null,
-        "username": "teste",
-        "password": "12345",
-        "skills": [
-            {
-                "id": 1,
-                "name": "Piano",
-                "description": "teste",
-                "type": "offered",
-                "usersId": 1,
-                "categoryId": 1,
-                "category": {
-                    "id": 1,
-                    "name": "Música"
-                }
-            },
-            {
-                "id": 1,
-                "name": "Guitarra",
-                "description": "teste",
-                "type": "offered",
-                "usersId": 1,
-                "categoryId": 1,
-                "category": {
-                    "id": 1,
-                    "name": "Música"
-                }
-            },
-            {
-                "id": 1,
-                "name": "Inglês",
-                "description": "teste",
-                "type": "sought",
-                "usersId": 1,
-                "categoryId": 1,
-                "category": {
-                    "id": 1,
-                    "name": "Música"
-                }
+    useEffect(() => {
+        async function load() {
+            try{
+                const response = await api.get("/users/get");
+                setUser(response.data);
+            }catch(err){
+                console.log("Erro ao pegar usuário: " + err);
             }
-        ]
+        }
+
+        load();
+    }, []);
+
+    if(!user){
+        return <p>carregando</p>
     }
+
+    
     return <div className='bg-light-purple h-screen'>
         {skillDelete && <ModalConfirm
             title={`Excluir ${skillDelete.name}`}

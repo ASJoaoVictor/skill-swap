@@ -10,11 +10,11 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 
 const router = createBrowserRouter([
-  { path: "/", element: <Index />},
+  { path: "/", element: <Login /> },
+  { path: "/register", element: <Register /> },
+  { path: "/index", element: <Index />},
   { path: "/matches", element: <Matches />},
   { path: "/user", element: <User />},
-  { path: "/login", element: <Login /> },
-  { path: "/register", element: <Register /> },
 ]);
 
 createRoot(document.getElementById('root')).render(

@@ -1,48 +1,22 @@
+import {useState, useEffect} from "react";
 import { X } from 'lucide-react';
+import api from "../services/api";
 
 const ModalAddSkill = ({title, subTitle, description, onCancel}) => {
-    const categories = [
-        {
-            "id": 1,
-            "name": "Música"
-        },
-        {
-            "id": 2,
-            "name": "Idiomas"
-        },
-        {
-            "id": 3,
-            "name": "Tecnologia"
-        },
-        {
-            "id": 4,
-            "name": "Design"
-        },
-        {
-            "id": 5,
-            "name": "Marketing"
-        },
-        {
-            "id": 6,
-            "name": "Fitness"
-        },
-        {
-            "id": 7,
-            "name": "Desenvolvimento pessoal"
-        },
-        {
-            "id": 8,
-            "name": "Reforço escolar"
-        },
-        {
-            "id": 9,
-            "name": "Culinária"
-        },
-        {
-            "id": 10,
-            "name": "Negócios"
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        async function load() {
+            try{
+                const response = await api.get("/category");
+                setCategories(response.data);
+            }catch(err){
+                console.log("Erro ao pegar dados de categorias " + err);
+            }
         }
-    ]
+
+        load();
+    }, []);
 
     return <div className="flex justify-center items-center bg-black/20 h-screen w-screen fixed insert-0">
         <form className="flex flex-col gap-4 bg-white p-8 rounded-md">
