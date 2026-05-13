@@ -7,12 +7,10 @@ const router = express.Router();
 router.post("/login", async (req, res) => {
     const [, hash] = req.headers.authorization?.split(" ") || [" ", " "];
     const [email, password] = Buffer.from(hash, "base64").toString().split(":");
-    console.log("hash")
     try{
         const user = await prisma.users.findFirst({
             where: {email: email.toLowerCase().trim()}
         })
-        console.log(user)
 
         if(!user) return res.status(401).json({ message: "Password or E-mail incorrect" })
         

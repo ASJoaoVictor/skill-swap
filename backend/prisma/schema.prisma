@@ -13,12 +13,14 @@ datasource db {
 }
 
 model Users {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
-  url_img  String?
-  username String
-  password String
-  skills   Skills[]
+  id               Int      @id @default(autoincrement())
+  email            String   @unique
+  url_img          String?
+  username         String
+  password         String
+  skills           Skills[]
+  matchesRequested Match[]  @relation("Requester")
+  matchesReceived  Match[]  @relation("Receiver")
 }
 
 model Skills {
@@ -36,4 +38,19 @@ model Category {
   id     Int      @id @default(autoincrement())
   name   String
   skills Skills[]
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Match {
+  id             Int         @id @default(autoincrement())
+  requesterId    Int
+  receiverId     Int
+  user_requester Users       @relation("Requester", fields: [requesterId], references: [id])
+  user_receiver  Users       @relation("Receiver", fields: [receiverId], references: [id])
+  status         MatchStatus @default(PENDING)
 }
