@@ -50,7 +50,7 @@ router.get("/get", async (req, res) => {
             }
         });
 
-        res.status(200).json({userData});
+        res.status(200).json(userData);
     }catch(err){
         console.log(err);
         res.status(404).json({ message: "Not found" })
