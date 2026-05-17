@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Hourglass, Check, UserRoundPlus } from "lucide-react";
 import Header from "../components/Header";
 import TabPending from "../components/TabPending";
@@ -6,6 +6,8 @@ import TabSent from "../components/TabSent";
 
 const Matches = () => {
     const [tabs, setTabs] = useState("pending");
+    const [countPending, setCountPending] = useState(0);
+    const [countSent, setCountSent] = useState(0);
 
     return <div className="bg-light-purple h-screen">
         <Header />
@@ -16,14 +18,14 @@ const Matches = () => {
                 <div className="flex items-center  w-60 rounded-lg gap-2 p-1 bg-white justify-center">
                     <Hourglass size={50} className="bg-orange-100 text-orange-400 rounded-md"/>
                     <div>
-                        <p className="text-xl font-bold">1</p>
+                        <p className="text-xl font-bold">{countPending}</p>
                         <p>Pendente</p>
                     </div>
                 </div>
                 <div className="flex items-center  w-60 rounded-lg gap-2 p-1 bg-white justify-center">
                     <UserRoundPlus  size={50} className="bg-gray-100 text-gray-400 rounded-md"/>
                     <div>
-                        <p className="text-xl font-bold">0</p>
+                        <p className="text-xl font-bold">{countSent}</p>
                         <p>Enviados</p>
                     </div>
                 </div>
@@ -66,8 +68,8 @@ const Matches = () => {
                 </p>
             </div>
 
-            {tabs === "pending" && <TabPending />}
-            {tabs === "sent" && <TabSent />}
+            {tabs === "pending" && <TabPending setCountPending={setCountPending} />}
+            {tabs === "sent" && <TabSent setCountSent={setCountSent}/>}
             {tabs === "accepted" && <p>aceitos</p>}
         </div>
     </div>

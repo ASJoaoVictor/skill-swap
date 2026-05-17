@@ -20,6 +20,19 @@ const Index = () => {
         load();
     }, []);
 
+    const handleSendMacth = async (receiverUser) => {
+        try{
+            const response = api.post("/match/send", {
+                "receiverUser": receiverUser
+            });
+
+            alert("Solicitação enviada!");
+        }catch(err){
+            console.log("Erro ao enviar macth", err);
+            alert("Não foi possível enviar solicitação!");
+        }
+    }
+
     return <div className='bg-light-purple min-h-screen h-full'>
         <Header />
         <main className='flex-1 h-full'>
@@ -28,8 +41,10 @@ const Index = () => {
                     <Card
                         key={user.id}
                         name={user.username}
+                        url_img={user.url_img}
                         habilidades_oferecidas={user.skills.filter((skill) => skill.type === "offered")}
                         habilidades_procuradas={user.skills.filter((skill) => skill.type === "sought")}
+                        sendMacth={() => handleSendMacth(user)}
                     />)
                 }
             </div>

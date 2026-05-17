@@ -64,11 +64,20 @@ router.get("/get/sent", async (req, res) => {
                 status: MatchStatus.PENDING
             },
             include: {
-                user_receiver: true,
+                user_receiver: {
+                    include: {
+                        skills: true,
+                    }
+                },
+                user_requester: {
+                    include: {
+                        skills: true
+                    }
+                }
             }
         });
 
-        res.status(200).json({matches});
+        res.status(200).json(matches);
     }catch(error){
         res.status(400).json({error: error.message});
     }
@@ -85,7 +94,16 @@ router.get("/get/received", async (req, res) => {
                 status: MatchStatus.PENDING
             },
             include: {
-                user_requester: true
+                user_receiver: {
+                    include: {
+                        skills: true,
+                    }
+                },
+                user_requester: {
+                    include: {
+                        skills: true
+                    }
+                }
             }
         });
         res.status(200).json(matches);

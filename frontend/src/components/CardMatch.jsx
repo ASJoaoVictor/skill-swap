@@ -1,16 +1,23 @@
 import {ArrowLeftRight} from "lucide-react";
 
-const CardMatch = () => {
+const CardMatch = ({match}) => {
+    console.log(match);
+
     return <div>
          <div className="flex justify-around items-center p-2">
             <div>
                 <div className="flex items-center">
-                    <img src="./foto-perfil.png" alt="" />
-                    <p>Nome do usuário</p>
+                    <img src={match.user_receiver.url_img} alt="" />
+                    <p>{match.user_receiver.username}</p>
                 </div>
                 <div>
-                    <p>Oferece:</p>
-                    <p className="bg-green-100 border border-green-500 text-green-500 w-fit rounded-md px-2 text-sm">Habilidade</p>
+                    <p>Procura:</p>
+                    <div className="flex flex-wrap w-full gap-2">
+                        {match.user_receiver.skills.filter((skill) => skill.type === "sought").map((skill) => 
+                            <p className="bg-white border border-purple text-purple w-fit rounded-md px-2 text-sm">{skill.name}</p>
+                        )}
+                    </div>
+
                 </div>
             </div>
 
@@ -21,12 +28,16 @@ const CardMatch = () => {
             <div className="flex jsutify-center w-auto">
                 <div>
                     <div className="flex items-center">
-                        <img src="./foto-perfil.png" alt="" />
-                        <p>Nome do usuário</p>
+                        <img src={match.user_requester.url_img} alt="" />
+                        <p>{match.user_requester.username}</p>
                     </div>
                     <div>
                         <p>Oferece:</p>
-                        <p className="bg-green-100 border border-green-500 text-green-500 w-fit rounded-md px-2 text-sm">Habilidade</p>
+                        <div className="flex flex-wrap w-full gap-2">
+                            {match.user_requester.skills.filter((skill) => skill.type === "offered").map((skill) => 
+                                <p className="bg-green-100 border border-green-500 text-green-500 w-fit rounded-md px-2 text-sm">{skill.name}</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

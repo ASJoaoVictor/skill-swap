@@ -1,8 +1,8 @@
 import CardMatch from "./CardMatch";
 
-const CardPending = () => {
+const CardPending = ({match, acceptMatch}) => {
     return <div className="bg-white rounded-md">
-        <CardMatch />
+        <CardMatch match={match}/>
 
         <hr className="mx-8 text-gray-400"/>
 
@@ -10,7 +10,7 @@ const CardPending = () => {
             <div className="flex justify-center w-full p-2 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
                 <button>Recusar</button>
             </div>
-            <div className="flex justify-center w-full p-2 rounded-md text-white bg-purple hover:opacity-70">
+            <div onClick={acceptMatch} className="flex justify-center w-full p-2 rounded-md text-white bg-purple hover:opacity-70">
                 <button>Aceitar</button>
             </div>
         </div>

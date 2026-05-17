@@ -1,8 +1,8 @@
 import CardMatch from "./CardMatch";
 
-const CardSent = () => {
+const CardSent = ({match}) => {
     return <div className="bg-white rounded-md">
-        <CardMatch />
+        <CardMatch match={match}/>
 
         <hr className="mx-8 text-gray-400"/>
 
