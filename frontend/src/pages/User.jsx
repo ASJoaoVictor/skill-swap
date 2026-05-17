@@ -43,7 +43,7 @@ const User = () => {
         {modalAddSkillOffered && <ModalAddSkill
             title="Adicionar Habilidade Oferecida"
             subTitle="Adicione uma habilidade que você pode ensinar aos outros"
-            description="Descreva brevemente sua experiência ou o que você gostaria de aprender"
+            descriptionMessage="Descreva brevemente sua experiência ou o que você gostaria de aprender"
             type="offered"
             onCancel={() => setModalAddSkillOffered(null)}
         />}
@@ -51,8 +51,8 @@ const User = () => {
         {modalAddSkillSought && <ModalAddSkill
             title="Adicionar Habilidade Procurada"
             subTitle="Adicione uma habilidade que você deseja aprender com outras pessoas"
-            description="Descreva brevemente o que você deseja aprender ou qual nível de conhecimento procura"
-            type="offered"
+            descriptionMessage="Descreva brevemente o que você deseja aprender ou qual nível de conhecimento procura"
+            type="sought"
             onCancel={() => setModalAddSkillSought(null)}
         />}
 
