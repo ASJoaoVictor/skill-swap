@@ -1,8 +1,6 @@
 import {ArrowLeftRight} from "lucide-react";
 
 const CardMatch = ({match}) => {
-    console.log(match);
-
     return <div>
          <div className="flex justify-around items-center p-2">
             <div>

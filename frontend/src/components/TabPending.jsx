@@ -7,25 +7,25 @@ const TabPending = ({setCountPending}) => {
     const [matches, setMatches] = useState([]);
 
     useEffect(() => {
-        async function load(){
-            try{
-                const response = await api.get("match/get/received");
-                setMatches(response.data);
-                setCountPending(response.data.length);
-            }catch(err){
-                console.log("Erro ao pegar matchs do banco: ", err)
-            }
-        }
-
         load();
     }, []);
+
+    async function load(){
+        try{
+            const response = await api.get("match/get/received");
+            setMatches(response.data);
+            setCountPending(response.data.length);
+        }catch(err){
+            console.log("Erro ao pegar matchs do banco: ", err)
+        }
+    }
 
     const handleAcceptMatch = async (match) => {
         try{
             const response = await api.post("/match/accept", {
                 "id": match.id
             });
-            window.location.reload();
+            load();
         }catch(err){
             console.log("Erro ao aceitar match: ", err);
             alert("Não foi possível aceitar match, tente mais tarde");
@@ -33,10 +33,24 @@ const TabPending = ({setCountPending}) => {
         }
     };
 
+    const handleRejectMatch = async (match) => {
+        try{
+            const response = await api.post("/match/cancel&reject", {
+                "id": match.id
+            });
+            load();
+        }catch(err){
+            console.log(err);
+            alert("Tente mais tarde");
+        }
+    }
+
     return <div className="flex flex-col gap-2">
         {matches.map((match) => 
             <CardPending 
+                key={match.id}
                 match={match} 
+                rejectMatch={() => handleRejectMatch(match)}
                 acceptMatch={() => handleAcceptMatch(match)}
             />
         )}

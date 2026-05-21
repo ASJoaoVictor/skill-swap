@@ -7,7 +7,10 @@ const TabSent = ({setCountSent}) => {
     const [matches, setMatches] = useState([]);
 
     useEffect(() => {
-        async function load(){
+        load();
+    }, []);
+
+    async function load(){
             try{
                 const response = await api.get("match/get/sent");
                 setMatches(response.data);
@@ -17,13 +20,24 @@ const TabSent = ({setCountSent}) => {
             }
         }
 
-        load();
-    }, []);
+    const handleCancelMatch = async (match) => {
+        try{
+            const response = await api.post("/match/cancel&reject", {
+                "id": match.id
+            });
+            load();
+        }catch(err){
+            console.log(err);
+            alert("Tente mais tarde");
+        }
+    }
 
     return <div className="flex flex-col gap-2">
         {matches.map((match) => 
             <CardSent
+                key={match.id}
                 match={match}
+                cancelMatch={() => handleCancelMatch(match)}
             />
         )}
     </div>

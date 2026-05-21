@@ -137,4 +137,26 @@ router.get("/get/accepted", async (req, res) => {
     }
 });
 
+router.post("/cancel&reject", async (req, res) => {
+    const {id} = req.body;
+    const { user } = req.headers;
+    const currentUser = JSON.parse(user);
+
+    try{
+        const match = await prisma.match.deleteMany({
+            where: {
+                id: id,
+                OR: [
+                    {receiverId: currentUser.id},
+                    {requesterId: currentUser.id}
+                ]
+            }
+        });
+
+        res.status(200).json({message: "sucesso"});
+    }catch(err){
+        res.status(400).json({message: "Erro ao recusar/cancelar skill"});
+    }
+});
+
 export default router;
