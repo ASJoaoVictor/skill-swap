@@ -20,9 +20,9 @@ const Header =() => {
             </Link>
             <div className="flex gap-4">
 
-                <Link to="/index"><House className='hover:text-purple'/></Link>
-                <Link to="/matches"><Heart className='hover:text-purple'/></Link>
-                <Link to="/user"><User className='hover:text-purple'/></Link>
+                <Link to="/index"><House className=' hover:text-purple hover:fill-purple'/></Link>
+                <Link to="/matches"><Heart className='hover:text-purple hover:fill-purple'/></Link>
+                <Link to="/user"><User className='hover:text-purple hover:fill-purple'/></Link>
                 <p onClick={handleLogout} className='text-2xl hover:text-purple cursor-pointer'>Sair</p>
             </div>
         </div>

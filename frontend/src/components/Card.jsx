@@ -1,9 +1,13 @@
-import { RefreshCcw } from 'lucide-react';
+import { RefreshCcw, CircleUserRound } from 'lucide-react';
 
 const Card = ({name, url_img, habilidades_oferecidas, habilidades_procuradas, sendMacth}) => {
     return <div className="flex flex-col justify-between bg-white shadow rounded-2xl mt-4 w-105 p-2">
         <div className="flex items-center gap-2">
-            <img src={url_img} alt="" className="h-20" />
+            {url_img ? 
+                <img src={url_img} alt="foto-perfil.png" className="h-20" />: 
+                <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
+            }
+            
             <p>{name}</p>
         </div>
         <p className="font-bold mt-4">Oferece:</p>

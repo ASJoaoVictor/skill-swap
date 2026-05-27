@@ -126,8 +126,16 @@ router.get("/get/accepted", async (req, res) => {
                 ]
             },
             include: {
-                user_receiver: true,
-                user_requester: true
+                user_receiver: {
+                    include: {
+                        skills: true,
+                    }
+                },
+                user_requester: {
+                    include: {
+                        skills: true
+                    }
+                }
             }
         });
 

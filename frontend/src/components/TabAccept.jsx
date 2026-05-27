@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
-import CardSent from "./CardSent"
+import CardAccept from "./CardAccept"
 
 
-const TabSent = ({matches, load}) => {
+const TabAccept = ({matches, load}) => {
     // const [matches, setMatches] = useState([]);
 
     // useEffect(() => {
@@ -25,7 +25,7 @@ const TabSent = ({matches, load}) => {
             const response = await api.post("/match/cancel&reject", {
                 "id": match.id
             });
-            load();
+            load;
         }catch(err){
             console.log(err);
             alert("Tente mais tarde");
@@ -34,7 +34,7 @@ const TabSent = ({matches, load}) => {
 
     return <div className="flex flex-col overflow-y-auto h-[70vh] gap-2">
         {matches.map((match) => 
-            <CardSent
+            <CardAccept
                 key={match.id}
                 match={match}
                 cancelMatch={() => handleCancelMatch(match)}
@@ -43,4 +43,4 @@ const TabSent = ({matches, load}) => {
     </div>
 }
 
-export default TabSent;
+export default TabAccept;

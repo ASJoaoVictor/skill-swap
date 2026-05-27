@@ -1,11 +1,14 @@
-import {ArrowLeftRight} from "lucide-react";
+import { ArrowLeftRight, CircleUserRound } from "lucide-react";
 
 const CardMatch = ({match}) => {
     return <div>
          <div className="flex justify-around items-center p-2">
             <div>
                 <div className="flex items-center">
-                    <img src={match.user_receiver.url_img} alt="" />
+                    {match.user_receiver.url_img ? 
+                        <img src={match.user_receiver.url_img} alt="foto-perfil.png" className="h-20" />: 
+                        <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
+                    }
                     <p>{match.user_receiver.username}</p>
                 </div>
                 <div>
@@ -26,7 +29,10 @@ const CardMatch = ({match}) => {
             <div className="flex jsutify-center w-auto">
                 <div>
                     <div className="flex items-center">
-                        <img src={match.user_requester.url_img} alt="" />
+                        {match.user_requester.url_img ? 
+                            <img src={match.user_requester.url_img} alt="foto-perfil.png" className="h-20" />: 
+                            <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
+                        }
                         <p>{match.user_requester.username}</p>
                     </div>
                     <div>

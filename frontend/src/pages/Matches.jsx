@@ -3,11 +3,50 @@ import { Hourglass, Check, UserRoundPlus } from "lucide-react";
 import Header from "../components/Header";
 import TabPending from "../components/TabPending";
 import TabSent from "../components/TabSent";
+import TabAccept from "../components/TabAccept";
+import api from "../services/api";
 
 const Matches = () => {
     const [tabs, setTabs] = useState("pending");
+
+    const [matchPending, setMatchPending] = useState([]);
+    const [matchAccepted, setMatchAccepted] = useState([]);
+    const [matchSent, setMatchSent] = useState([]);
+
     const [countPending, setCountPending] = useState(0);
     const [countSent, setCountSent] = useState(0);
+    const [countAccept, setCountAccept] = useState(0);
+
+    const load = async () => {
+        try{
+            const [
+                response_pending,
+                response_sent,
+                response_accepted
+            ] = await Promise.all([
+                api.get("match/get/received"),
+                api.get("match/get/sent"),
+                api.get("match/get/accepted")
+            ]);
+
+            setMatchPending(response_pending.data);
+            setCountPending(response_pending.data.length);
+
+            setMatchSent(response_sent.data);
+            setCountSent(response_sent.data.length);
+            
+            setMatchAccepted(response_accepted.data);
+            setCountAccept(response_accepted.data.length);
+        }catch(err){
+            console.log("Erro ao pegar os matchs do banco" + err);
+            alert("erro")
+        }
+    }
+
+    useEffect(() => {
+        load();
+    }, []);
+
 
     return <div className="bg-light-purple h-screen">
         <Header />
@@ -32,7 +71,7 @@ const Matches = () => {
                  <div className="flex items-center  w-60 rounded-lg gap-2 p-1 bg-white justify-center">
                     <Check size={50} className="bg-green-100 text-green-400 rounded-md"/>
                     <div>
-                        <p className="text-xl font-bold">0</p>
+                        <p className="text-xl font-bold">{countAccept}</p>
                         <p>Aceitos</p>
                     </div>
                 </div>
@@ -68,9 +107,9 @@ const Matches = () => {
                 </p>
             </div>
 
-            {tabs === "pending" && <TabPending setCountPending={setCountPending} />}
-            {tabs === "sent" && <TabSent setCountSent={setCountSent}/>}
-            {tabs === "accepted" && <p>aceitos</p>}
+            {tabs === "pending" && <TabPending matches={matchPending} load={load}/>}
+            {tabs === "sent" && <TabSent matches={matchSent} load={load}/>}
+            {tabs === "accepted" && <TabAccept matches={matchAccepted} load={load}/>}
         </div>
     </div>
 };

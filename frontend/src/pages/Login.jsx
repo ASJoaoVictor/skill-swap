@@ -43,8 +43,8 @@ const Login = () => {
 
                     <button className="bg-purple text-white mt-4 w-60 h-10 rounded-lg cursor-pointer" type="submit">Entrar</button>
                 </form>
-                <div className="flex justify-center items-center gap-2 h-10 mt-4 border cursor-pointer rounded-md">
-                    <img src="./icon-google.png" alt="" className="w-10" />
+                <div className="flex justify-center items-center gap-1 h-10 mt-4 border cursor-pointer rounded-md">
+                    <img src="./icon-google.png" alt="" className="w-5" />
                     <p>Continuar com o google</p>
                 </div>
             </div>
