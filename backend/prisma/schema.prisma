@@ -13,14 +13,16 @@ datasource db {
 }
 
 model Users {
-  id               Int      @id @default(autoincrement())
-  email            String   @unique
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
   url_img          String?
   username         String
   password         String
   skills           Skills[]
-  matchesRequested Match[]  @relation("Requester")
-  matchesReceived  Match[]  @relation("Receiver")
+  matchesRequested Match[]   @relation("Requester")
+  matchesReceived  Match[]   @relation("Receiver")
+  chats            Chat[]    @relation("ChatParticipants")
+  messages         Message[]
 }
 
 model Skills {
@@ -53,4 +55,21 @@ model Match {
   user_requester Users       @relation("Requester", fields: [requesterId], references: [id])
   user_receiver  Users       @relation("Receiver", fields: [receiverId], references: [id])
   status         MatchStatus @default(PENDING)
+}
+
+model Chat {
+  id           String    @id @default(uuid())
+  participants Users[]   @relation("ChatParticipants")
+  messages     Message[]
+  createAt     DateTime  @default(now())
+}
+
+model Message {
+  id       String   @id @default(uuid())
+  text     String
+  chat     Chat     @relation(fields: [chatId], references: [id])
+  sender   Users    @relation(fields: [usersId], references: [id])
+  createAt DateTime @default(now())
+  chatId   String
+  usersId  Int
 }

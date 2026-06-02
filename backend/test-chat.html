@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Chat</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; }
+    #messages { border: 1px solid #ccc; height: 300px; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+    .msg { margin: 6px 0; }
+    .mine { color: blue; }
+    .other { color: green; }
+    input, button { padding: 8px; margin: 4px; }
+  </style>
+</head>
+<body>
+  <h2>Teste de Chat</h2>
+
+  <div>
+    <input id="chatId" placeholder="ID da conversa (ex: chat_123)" value="chat_123"/>
+    <button onclick="joinChat()">Entrar</button>
+  </div>
+
+  <div id="messages"></div>
+
+  <div>
+    <input id="msgInput" placeholder="Digite uma mensagem..." style="width: 70%"/>
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+
+  <p>Meu socket ID: <strong id="myId"></strong></p>
+
+  <script>
+    const socket = io("https://stunning-barnacle-jj75qw6qjq54cp64j-3000.app.github.dev/");
+    let currentChat = null;
+
+    socket.on("connect", () => {
+      document.getElementById("myId").textContent = socket.id;
+    });
+
+    function joinChat() {
+      const chatId = document.getElementById("chatId").value;
+      socket.emit("join_chat", chatId);
+      currentChat = chatId;
+      addMessage(`✅ Entrou na conversa: ${chatId}`, "system");
+    }
+
+    function sendMessage() {
+      const text = document.getElementById("msgInput").value;
+      if (!currentChat || !text) return;
+
+      socket.emit("send_message", { chatId: currentChat, text });
+      document.getElementById("msgInput").value = "";
+    }
+
+    socket.on("new_message", (msg) => {
+      const isMine = msg.senderId === socket.id;
+      addMessage(`${isMine ? "Eu" : "Outro"}: ${msg.text}`, isMine ? "mine" : "other");
+    });
+
+    function addMessage(text, type) {
+      const div = document.createElement("div");
+      div.className = `msg ${type}`;
+      div.textContent = text;
+      document.getElementById("messages").appendChild(div);
+      div.scrollIntoView();
+    }
+  </script>
+</body>
+</html>
