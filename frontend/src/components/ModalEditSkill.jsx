@@ -34,7 +34,7 @@ const ModalEditSkill = ({skill, onCancel}) => {
                 <div className="flex w-full justify-end">
                     <X className="text-red-500 text-xl" onClick={onCancel}/>
                 </div>
-                <h1 className="text-lg font-bold text-center">{name} Editar Habilidade Oferecida</h1>
+                <h1 className="text-lg font-bold text-center">Editar Habilidade Oferecida</h1>
                 <p className="text-sm text-gray-500 mb-4 text-center">Atualize as informações da habilidade que você deseja ensinar</p>
             </div>
             <div>

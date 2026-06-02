@@ -15,16 +15,16 @@ const User = () => {
     const [modalEditSkillOffered, setModalEditSkillOffered] = useState(null)
     const [modalEditSkillSought, setModalEditSkillSought] = useState(null)
 
-    useEffect(() => {
-        async function load() {
-            try{
-                const response = await api.get("/users/get");
-                setUser(response.data);
-            }catch(err){
-                console.log("Erro ao pegar usuário: " + err);
-            }
+    async function load() {
+        try{
+            const response = await api.get("/users/get");
+            setUser(response.data);
+        }catch(err){
+            console.log("Erro ao pegar usuário: " + err);
         }
+    }
 
+    useEffect(() => {
         load();
     }, []);
 
@@ -46,7 +46,8 @@ const User = () => {
             descriptionMessage="Descreva brevemente sua experiência ou o que você gostaria de aprender"
             type="offered"
             onCancel={() => setModalAddSkillOffered(null)}
-        />}
+            reload={() => load()}
+            />}
 
         {modalAddSkillSought && <ModalAddSkill
             title="Adicionar Habilidade Procurada"
@@ -54,6 +55,7 @@ const User = () => {
             descriptionMessage="Descreva brevemente o que você deseja aprender ou qual nível de conhecimento procura"
             type="sought"
             onCancel={() => setModalAddSkillSought(null)}
+            reload={() => load()}
         />}
 
         {modalEditSkillOffered && <ModalEditSkill
@@ -74,7 +76,7 @@ const User = () => {
                 <p className='font-bold text-2xl'>Minhas Habilidades</p>
                 <div className='flex items-center gap-4 p-6 rounded-2xl bg-white'> 
                     {user.url_img ? 
-                        <img src={user.url_img} alt="foto-perfil.png" className="h-20" />: 
+                        <img src={user.url_img} alt="foto-perfil.png" className="h-20 rounded-full" />: 
                         <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
                     }
                     <div className='items-center'>

@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import { X } from 'lucide-react';
 import api from "../services/api";
 
-const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, type}) => {
+const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, reload, type}) => {
     const [categories, setCategories] = useState([]);
     const [name, setName] = useState(null);
     const [description, setDescription] = useState(null);
@@ -31,8 +31,8 @@ const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, type}) =>
                 "type": type,
                 "categoryId": category
             });
-
-            window.location.href = "/user";
+            reload();
+            onCancel();
         }catch(err){
             console.log("Erro ao adicionar skill " + err);
             alert("Não foi possível cadastrar habilidade");

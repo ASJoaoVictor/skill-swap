@@ -4,7 +4,7 @@ const Card = ({name, url_img, habilidades_oferecidas, habilidades_procuradas, se
     return <div className="flex flex-col justify-between bg-white shadow rounded-2xl mt-4 w-105 p-2">
         <div className="flex items-center gap-2">
             {url_img ? 
-                <img src={url_img} alt="foto-perfil.png" className="h-20" />: 
+                <img src={url_img} alt="foto-perfil.png" className="h-20 rounded-full" />: 
                 <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
             }
             

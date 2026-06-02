@@ -20,8 +20,8 @@ const Register  = () => {
                 "confPassword": confPassword,
             });
 
-            window.location.href = "/";
-            alert("Usuário cadastrado com sucesso!")
+            localStorage.setItem("token", response.data.token);
+            window.location.href = "/index";
         }catch(err){
             console.log(err);
             alert("Não foi possível cadastrar usuário, tente mais tarde");

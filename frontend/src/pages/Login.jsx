@@ -3,9 +3,15 @@ import {RefreshCcw, Target} from 'lucide-react';
 import { Link } from 'react-router';
 import api from "../services/api";
 
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+
+
+
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    console.log(window.location.origin)
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -43,10 +49,31 @@ const Login = () => {
 
                     <button className="bg-purple text-white mt-4 w-60 h-10 rounded-lg cursor-pointer" type="submit">Entrar</button>
                 </form>
-                <div className="flex justify-center items-center gap-1 h-10 mt-4 border cursor-pointer rounded-md">
+                <div className="mt-4">
+                    <GoogleOAuthProvider clientId="922552228261-31b8t1p974j8emk7pgdrjdkat8jqt50l.apps.googleusercontent.com">
+                        <GoogleLogin
+                            onSuccess={async (credentialResponse) => {
+                                try{
+                                    const response = await api.post("/login/google", {
+                                        "token": credentialResponse.credential
+                                    })
+
+                                    localStorage.setItem("token", response.data.token);
+                                    window.location.href = "./index";
+                                }catch(err){
+                                    console.log(err);
+                                }
+                            }}
+                            onError={() => {
+                                console.log('Login Failed');
+                            }}
+                        />
+                    </GoogleOAuthProvider>
+                </div>
+                {/* <div className="flex justify-center items-center gap-1 h-10 mt-4 border cursor-pointer rounded-md">
                     <img src="./icon-google.png" alt="" className="w-5" />
                     <p>Continuar com o google</p>
-                </div>
+                </div> */}
             </div>
             <p className="text-sm">Não tem uma conta? <Link to="/register" className='text-purple font-bold'>Cadastre-se</Link></p>
         </div>

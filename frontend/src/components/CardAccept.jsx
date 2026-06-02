@@ -39,7 +39,7 @@ const CardAccept = ({match, cancelMatch}) => {
             <div>
                 <div className="flex items-center gap-2">
                 {contact.url_img ? 
-                    <img src={contact.url_img} alt="foto-perfil.png" className="h-20" />: 
+                    <img src={contact.url_img} alt="foto-perfil.png" className="h-20 rounded-full" />: 
                     <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
                 }
                 
