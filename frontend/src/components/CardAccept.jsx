@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { CircleUserRound, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { CircleUserRound, ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
 import CardMatch from "./CardMatch";
+
+import ChatModal from "./ChatModal";
 import api  from "../services/api";
 
 const CardAccept = ({match, cancelMatch}) => {
 
     const [contact, setContact] = useState(null);
+    const [chatOpen, setChatOpen] = useState(false);
 
     useEffect(() => {
         async function load(){
@@ -46,6 +49,14 @@ const CardAccept = ({match, cancelMatch}) => {
                 <div>
                     <p>{contact.username}</p>
                     <p onClick={copiarEmail} className="cursor-pointer hover:underline hover:opacity-70">Contato: <b>{contact.email}</b></p>
+
+                    <button
+                        onClick={() => setChatOpen(true)}
+                        className="flex items-center gap-1 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition"
+                    >
+                        <MessageCircle size={16} />
+                        Chat
+                    </button>
                 </div>
             </div>
 
@@ -57,6 +68,12 @@ const CardAccept = ({match, cancelMatch}) => {
             </div>
 
         </div>
+        {chatOpen && (
+            <ChatModal
+                contact={contact}
+                onClose={() => setChatOpen(false)}
+            />
+        )}
     </div>
 }
 
