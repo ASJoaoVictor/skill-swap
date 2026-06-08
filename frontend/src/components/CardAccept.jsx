@@ -52,7 +52,7 @@ const CardAccept = ({match, cancelMatch}) => {
 
                     <button
                         onClick={() => setChatOpen(true)}
-                        className="flex items-center gap-1 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition"
+                        className="flex items-center gap-1 px-3 py-2 bg-purple text-white rounded-lg text-sm hover:opacity-70 transition"
                     >
                         <MessageCircle size={16} />
                         Chat

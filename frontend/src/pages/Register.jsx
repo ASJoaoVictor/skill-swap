@@ -2,6 +2,7 @@ import { useState } from "react";
 import {RefreshCcw} from "lucide-react";
 import {Link} from "react-router";
 import api from "../services/api";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Register  = () => {
     const [name, setName] = useState(null);
@@ -24,7 +25,8 @@ const Register  = () => {
             window.location.href = "/index";
         }catch(err){
             console.log(err);
-            alert("Não foi possível cadastrar usuário, tente mais tarde");
+            toast.error("Não foi possível cadastrar usuário, tente mais tarde")
+
         }
     }
 
@@ -36,9 +38,10 @@ const Register  = () => {
                 </div>
                 <p className='text-xl font-bold'>Bem-vindo</p>
             </div>
+            <Toaster />
             <div>            
                 <form onSubmit={handleRegister}>
-                    <label htmlFor="name">Nome {password}</label><br />
+                    <label htmlFor="name">Nome</label><br />
                     <input onChange={(e) => setName(e.target.value)} className="bg-gray-200 px-2 w-60 h-10 rounded-lg" type="text" name="name" id="name" placeholder="Seu nome"/><br />
 
                     <label htmlFor="email">E-mail</label><br />
@@ -48,7 +51,7 @@ const Register  = () => {
                     <input onChange={(e) => setPassword(e.target.value)} className="bg-gray-200 px-2 w-60 h-10 rounded-lg" type="password" name="password" id="password" placeholder="********"/><br />
 
                     <label htmlFor="conf-password">Confirmar senha</label><br />
-                    <input onChange={(e) => setConfPassword(e.target.value)} className="bg-gray-200 px-2 w-60 h-10 rounded-lg" type="text" name="conf-password" id="conf-password" placeholder="********"/><br />
+                    <input onChange={(e) => setConfPassword(e.target.value)} className="bg-gray-200 px-2 w-60 h-10 rounded-lg" type="password" name="conf-password" id="conf-password" placeholder="********"/><br />
 
                     <button className="bg-purple text-white mt-4 w-60 h-10 rounded-lg cursor-pointer" type="submit">Criar conta</button>
                 </form>

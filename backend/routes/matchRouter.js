@@ -125,6 +125,7 @@ router.get("/get/accepted", async (req, res) => {
                     {requesterId: currentUser.id}
                 ]
             },
+            distinct: ["receiverId"],
             include: {
                 user_receiver: {
                     include: {

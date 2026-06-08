@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { X, Send, CircleUserRound } from "lucide-react";
 import { useSocket } from "../services/useSocket";
-import api from "../services/api";
 import { jwtDecode } from "jwt-decode";
+import api from "../services/api";
 
 const ChatModal = ({ contact, onClose }) => {
     const [messages, setMessages] = useState([]);
@@ -12,37 +12,29 @@ const ChatModal = ({ contact, onClose }) => {
     const bottomRef = useRef(null);
     const socketRef = useSocket();
 
-    // Pega o ID do usuário logado a partir do token
     const token = localStorage.getItem("token");
-    const myId = token ? jwtDecode(token).id : null;
+    const myId = token ? JSON.parse(jwtDecode(token).user).id : null;
 
     useEffect(() => {
         async function initChat() {
-            try {
-                // Cria ou busca o chat entre os dois usuários
-                const res = await api.post("/chat", {
-                    userAId: myId,
-                    userBId: contact.id
-                });
-                const chat = res.data;
-                setChatId(chat.id);
+            const response = await api.post("/chat", {
+                senderId: contact.id
+            });
 
-                // Entra na room do socket
-                socketRef.current.emit("join_chat", chat.id);
-            } catch (err) {
-                console.error("Erro ao iniciar chat:", err);
-            } finally {
-                setLoading(false);
-            }
+            const chat = response.data;
+
+            setChatId(chat.id);
+            setLoading(false);
+
+            socketRef.current.emit("join_chat", chat.id);
         }
+
         initChat();
 
-        // Recebe histórico ao entrar
         socketRef.current.on("chat_history", (history) => {
             setMessages(history);
         });
 
-        // Recebe mensagens em tempo real
         socketRef.current.on("new_message", (msg) => {
             setMessages((prev) => [...prev, msg]);
         });
@@ -53,7 +45,6 @@ const ChatModal = ({ contact, onClose }) => {
         };
     }, [contact.id]);
 
-    // Scroll automático para última mensagem
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
@@ -79,17 +70,14 @@ const ChatModal = ({ contact, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-end justify-end p-4">
-            {/* Overlay */}
             <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            {/* Chat window */}
             <div className="relative z-10 flex flex-col w-full max-w-md h-[520px] bg-white rounded-2xl shadow-2xl overflow-hidden">
 
-                {/* Header */}
-                <div className="flex items-center gap-3 px-4 py-3 bg-purple-600 text-white">
+                <div className="flex items-center gap-3 px-4 py-3 bg-purple text-white">
                     {contact.url_img ? (
                         <img src={contact.url_img} className="w-10 h-10 rounded-full object-cover" alt="" />
                     ) : (
@@ -97,14 +85,12 @@ const ChatModal = ({ contact, onClose }) => {
                     )}
                     <div className="flex-1">
                         <p className="font-semibold">{contact.username}</p>
-                        <p className="text-xs opacity-70">{contact.email}</p>
                     </div>
                     <button onClick={onClose} className="hover:opacity-70 transition">
                         <X size={20} />
                     </button>
                 </div>
 
-                {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-2 bg-gray-50">
                     {loading && (
                         <p className="text-center text-sm text-gray-400">Carregando...</p>
@@ -115,7 +101,7 @@ const ChatModal = ({ contact, onClose }) => {
                         </p>
                     )}
                     {messages.map((msg) => {
-                        const isMine = msg.usersId === myId;
+                        const isMine = parseInt(msg.senderId ?? msg.usersId) === myId;
                         return (
                             <div
                                 key={msg.id}
@@ -124,7 +110,7 @@ const ChatModal = ({ contact, onClose }) => {
                                 <div
                                     className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm ${
                                         isMine
-                                            ? "bg-purple-600 text-white rounded-br-sm"
+                                            ? "bg-purple text-white rounded-br-sm"
                                             : "bg-white text-gray-800 shadow rounded-bl-sm"
                                     }`}
                                 >
@@ -142,7 +128,6 @@ const ChatModal = ({ contact, onClose }) => {
                     <div ref={bottomRef} />
                 </div>
 
-                {/* Input */}
                 <div className="flex items-center gap-2 px-4 py-3 border-t bg-white">
                     <input
                         type="text"
@@ -155,7 +140,7 @@ const ChatModal = ({ contact, onClose }) => {
                     <button
                         onClick={sendMessage}
                         disabled={!text.trim()}
-                        className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center hover:bg-purple-700 disabled:opacity-40 transition"
+                        className="w-10 h-10 rounded-full bg-purple text-white flex items-center justify-center hover:opacity-80 disabled:opacity-40 transition"
                     >
                         <Send size={16} />
                     </button>

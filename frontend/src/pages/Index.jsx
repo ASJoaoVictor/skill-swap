@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Card from "../components/Card";
 import api from "../services/api";
+import toast, {Toaster} from "react-hot-toast";
 
 const Index = () => {
 
@@ -26,16 +27,16 @@ const Index = () => {
                 "receiverUser": receiverUser
             });
 
-            alert("Solicitação enviada!");
+            toast.success("Solicitação enviada!")
         }catch(err){
-            console.log("Erro ao enviar macth", err);
-            alert("Não foi possível enviar solicitação!");
+            toast.error("Não foi possível enviar solicitação!")
         }
     }
 
     return <div className='bg-light-purple min-h-screen h-full'>
         <Header />
         <main className='flex-1 h-full'>
+            <Toaster />
             <div className='grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 max-w-325 m-auto'>
                 {users.map((user) =>
                     <Card

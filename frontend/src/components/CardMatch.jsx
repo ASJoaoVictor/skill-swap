@@ -30,7 +30,7 @@ const CardMatch = ({match}) => {
                 <div>
                     <div className="flex items-center">
                         {match.user_requester.url_img ? 
-                            <img src={match.user_requester.url_img} alt="foto-perfil.png" className="h-20" />: 
+                            <img src={match.user_requester.url_img} alt="foto-perfil.png" className="h-20 rounded-full" />: 
                             <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
                         }
                         <p>{match.user_requester.username}</p>

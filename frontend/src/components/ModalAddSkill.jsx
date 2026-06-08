@@ -1,6 +1,7 @@
 import {useState, useEffect} from "react";
 import { X } from 'lucide-react';
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, reload, type}) => {
     const [categories, setCategories] = useState([]);
@@ -34,8 +35,7 @@ const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, reload, t
             reload();
             onCancel();
         }catch(err){
-            console.log("Erro ao adicionar skill " + err);
-            alert("Não foi possível cadastrar habilidade");
+            toast.error("Não foi possível adicionar skill!");
         }
     };
 

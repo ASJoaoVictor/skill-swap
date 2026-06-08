@@ -1,12 +1,17 @@
 import {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router';
 import Header from '../components/Header';
 import { Trash, Pencil, Plus, CircleUserRound } from 'lucide-react';
 import ModalConfirm from '../components/ModalConfirm';
 import ModalAddSkill from '../components/ModalAddSkill';
 import ModalEditSkill from '../components/ModalEditSkill';
+import LoadingPage from './LoadingPage';
 import api from '../services/api';
+import toast, { Toaster } from 'react-hot-toast';
 
 const User = () => {
+
+    const navigate = useNavigate();
 
     const [user, setUser] = useState(null);
     const [skillDelete, setSkillDelete] = useState(null);
@@ -20,7 +25,8 @@ const User = () => {
             const response = await api.get("/users/get");
             setUser(response.data);
         }catch(err){
-            console.log("Erro ao pegar usuário: " + err);
+            toast.error("Não foi possível acessar essa página, tente mais tarde!");
+            navigate("/index");
         }
     }
 
@@ -29,7 +35,7 @@ const User = () => {
     }, []);
 
     if(!user){
-        return <p>carregando</p>
+        return <LoadingPage />
     }
 
     
@@ -71,7 +77,7 @@ const User = () => {
 
         <Header />
         <div className='max-w-325 m-auto mt-8'>
-            
+            <Toaster />
             <div>
                 <p className='font-bold text-2xl'>Minhas Habilidades</p>
                 <div className='flex items-center gap-4 p-6 rounded-2xl bg-white'> 

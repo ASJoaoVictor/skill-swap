@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import {RefreshCcw, Target} from 'lucide-react';
 import { Link } from 'react-router';
 import api from "../services/api";
+import toast, { Toaster } from 'react-hot-toast';
 
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
@@ -22,12 +23,11 @@ const Login = () => {
                     password: password,
                 },
             });
-            console.log(response.data.token)
             localStorage.setItem("token", response.data.token);
             window.location.href = "./index";
         }catch(err){
             console.error(err);
-            alert("Deu erro");
+            toast.error("Email ou senha incorretos");
         }
     };
 
@@ -49,6 +49,7 @@ const Login = () => {
 
                     <button className="bg-purple text-white mt-4 w-60 h-10 rounded-lg cursor-pointer" type="submit">Entrar</button>
                 </form>
+                <Toaster />
                 <div className="mt-4">
                     <GoogleOAuthProvider clientId="922552228261-31b8t1p974j8emk7pgdrjdkat8jqt50l.apps.googleusercontent.com">
                         <GoogleLogin

@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { Hourglass, Check, UserRoundPlus } from "lucide-react";
 import Header from "../components/Header";
 import TabPending from "../components/TabPending";
 import TabSent from "../components/TabSent";
 import TabAccept from "../components/TabAccept";
 import api from "../services/api";
+import toast, { Toaster } from "react-hot-toast";
 
 const Matches = () => {
+    const navigate = useNavigate();
+
     const [tabs, setTabs] = useState("pending");
 
     const [matchPending, setMatchPending] = useState([]);
@@ -39,7 +43,8 @@ const Matches = () => {
             setCountAccept(response_accepted.data.length);
         }catch(err){
             console.log("Erro ao pegar os matchs do banco" + err);
-            alert("erro")
+            toast.error("Não foi possível acessar essa página, tente mais tarde!");
+            navigate("/index");
         }
     }
 
@@ -50,6 +55,7 @@ const Matches = () => {
 
     return <div className="bg-light-purple h-screen">
         <Header />
+        <Toaster />
         <div className="max-w-325 m-auto mt-8">
             <p className="font-bold text-2xl">Seus Matches</p>
 

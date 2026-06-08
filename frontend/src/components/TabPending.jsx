@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import CardPending from "./CardPending"
 import api from "../services/api";
+import toast, { Toaster } from "react-hot-toast";
+
 
 const TabPending = ({matches, load}) => {
 
@@ -25,10 +27,9 @@ const TabPending = ({matches, load}) => {
                 "id": match.id
             });
             load();
+            toast.success("Aceito!");
         }catch(err){
-            console.log("Erro ao aceitar match: ", err);
-            alert("Não foi possível aceitar match, tente mais tarde");
-            alert(match.id)
+            toast.error("Não foi possível aceitar soliticitação, tente mais tarde!");
         }
     };
 
@@ -38,9 +39,10 @@ const TabPending = ({matches, load}) => {
                 "id": match.id
             });
             load();
+            toast.success("Rejeitado!");
         }catch(err){
             console.log(err);
-            alert("Tente mais tarde");
+            toast.error("Não foi possível executar ação!")
         }
     }
 

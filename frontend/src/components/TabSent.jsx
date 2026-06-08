@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import CardSent from "./CardSent"
+import toast from "react-hot-toast";
 
 
 const TabSent = ({matches, load}) => {
@@ -26,9 +27,9 @@ const TabSent = ({matches, load}) => {
                 "id": match.id
             });
             load();
+            toast.success("Envio cancelado!");
         }catch(err){
-            console.log(err);
-            alert("Tente mais tarde");
+            toast.error("Não foi possível executar ação!");
         }
     }
 
