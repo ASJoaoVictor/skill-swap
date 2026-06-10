@@ -38,6 +38,7 @@ const TabAccept = ({matches, load}) => {
                 key={match.id}
                 match={match}
                 cancelMatch={() => handleCancelMatch(match)}
+                resfresh={load}
             />
         )}
     </div>

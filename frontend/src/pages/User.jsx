@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router';
 import Header from '../components/Header';
-import { Trash, Pencil, Plus, CircleUserRound } from 'lucide-react';
+import { Trash, Pencil, Plus, CircleUserRound, ThumbsUp } from 'lucide-react';
 import ModalConfirm from '../components/ModalConfirm';
 import ModalAddSkill from '../components/ModalAddSkill';
 import ModalEditSkill from '../components/ModalEditSkill';
@@ -37,6 +37,8 @@ const User = () => {
     if(!user){
         return <LoadingPage />
     }
+
+    console.log(user._count);
 
     
     return <div className='bg-light-purple h-screen'>
@@ -87,6 +89,7 @@ const User = () => {
                     }
                     <div className='items-center'>
                         <p>{user.username}</p>
+                        <p className='flex gap-2'><ThumbsUp size={20} className='fill-purple text-purple'/> {user._count.matchesReceived + user._count.matchesRequested }</p>
                         {/* <p>Membro deste de março de 2026</p> */}
                     </div>
                 </div>

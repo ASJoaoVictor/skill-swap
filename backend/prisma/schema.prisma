@@ -48,13 +48,19 @@ enum MatchStatus {
   REJECTED
 }
 
+enum RatingStatus {
+  UP
+  DOWN
+}
+
 model Match {
-  id             Int         @id @default(autoincrement())
+  id             Int           @id @default(autoincrement())
+  rating         RatingStatus?
   requesterId    Int
   receiverId     Int
-  user_requester Users       @relation("Requester", fields: [requesterId], references: [id])
-  user_receiver  Users       @relation("Receiver", fields: [receiverId], references: [id])
-  status         MatchStatus @default(PENDING)
+  user_requester Users         @relation("Requester", fields: [requesterId], references: [id])
+  user_receiver  Users         @relation("Receiver", fields: [receiverId], references: [id])
+  status         MatchStatus   @default(PENDING)
 }
 
 model Chat {

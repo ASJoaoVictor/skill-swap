@@ -1,7 +1,7 @@
 import express from "express";
 import { prisma } from "../modules/prisma.js";
 import { tokenValited } from "../modules/auth.js";
-import { MatchStatus } from "../generated/prisma/index.js";
+import { MatchStatus, RatingStatus } from "../generated/prisma/index.js";
 
 const router = express.Router();
 
@@ -125,7 +125,6 @@ router.get("/get/accepted", async (req, res) => {
                     {requesterId: currentUser.id}
                 ]
             },
-            distinct: ["receiverId"],
             include: {
                 user_receiver: {
                     include: {
@@ -165,6 +164,46 @@ router.post("/cancel&reject", async (req, res) => {
         res.status(200).json({message: "sucesso"});
     }catch(err){
         res.status(400).json({message: "Erro ao recusar/cancelar skill"});
+    }
+});
+
+router.put("/like", async (req, res) => {
+    const { match_id } = req.body;
+    
+    try{
+        const match = await prisma.match.update({
+            where: {
+                id: parseInt(match_id),
+            },
+            data: {
+                rating: RatingStatus.UP,
+            }
+        })
+
+        res.status(200).json(match);
+    }catch(err){
+        console.error(err.message);
+        res.status(400).json({error: err.message});
+    }
+});
+
+router.put("/deslike", async (req, res) => {
+    const { match_id } = req.body;
+    
+    try{
+        const match = await prisma.match.update({
+            where: {
+                id: parseInt(match_id),
+            },
+            data: {
+                rating: RatingStatus.DOWN,
+            }
+        })
+
+        res.status(200).json(match);
+    }catch(err){
+        console.error(err.message);
+        res.status(400).json({error: err.message});
     }
 });
 
