@@ -55,7 +55,8 @@ enum RatingStatus {
 
 model Match {
   id             Int           @id @default(autoincrement())
-  rating         RatingStatus?
+  ratingRequester         RatingStatus?
+  ratingReceiver         RatingStatus?
   requesterId    Int
   receiverId     Int
   user_requester Users         @relation("Requester", fields: [requesterId], references: [id])

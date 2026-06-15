@@ -42,7 +42,7 @@ const Matches = () => {
             setMatchAccepted(response_accepted.data);
             setCountAccept(response_accepted.data.length);
         }catch(err){
-            console.log("Erro ao pegar os matchs do banco" + err);
+            console.log("Erro ao pegar os matchs do banco " + err);
             toast.error("Não foi possível acessar essa página, tente mais tarde!");
             navigate("/index");
         }
