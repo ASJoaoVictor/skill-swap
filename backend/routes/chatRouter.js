@@ -1,16 +1,15 @@
 import express from "express";
 import jsonwebtoken from "jsonwebtoken";
+import { tokenValited } from "../modules/auth.js";
 import { prisma } from "../modules/prisma.js";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
-    const [, token] = req.headers.authorization?.split(" ") || [];
-    
-    if (!token) return res.status(401).json({ message: "Token não encontrado" });
+router.use(tokenValited);
 
-    const decoded = jsonwebtoken.verify(token, process.env.PRIVATE_KEY);
-    const currentUser = JSON.parse(decoded.user);
+router.post("/", async (req, res) => {
+    const {user} = req.headers;
+    const currentUser = JSON.parse(user);
 
     const {senderId} = req.body;
 

@@ -12,7 +12,7 @@ export function tokenValited(req, res, next){
         const userIdFromToken = typeof payload !== "string" && payload.user;
         
         if(!userIdFromToken){
-            return res.send(401).json({ message: "Invalid token" });
+            return res.status(401).json({ message: "Invalid token" });
         }
         
         req.headers["user"] = payload.user;

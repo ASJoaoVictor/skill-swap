@@ -18,6 +18,7 @@ model Users {
   url_img          String?
   username         String
   password         String
+  like             Int       @default(0)
   skills           Skills[]
   matchesRequested Match[]   @relation("Requester")
   matchesReceived  Match[]   @relation("Receiver")
@@ -54,14 +55,14 @@ enum RatingStatus {
 }
 
 model Match {
-  id             Int           @id @default(autoincrement())
-  ratingRequester         RatingStatus?
-  ratingReceiver         RatingStatus?
-  requesterId    Int
-  receiverId     Int
-  user_requester Users         @relation("Requester", fields: [requesterId], references: [id])
-  user_receiver  Users         @relation("Receiver", fields: [receiverId], references: [id])
-  status         MatchStatus   @default(PENDING)
+  id              Int           @id @default(autoincrement())
+  ratingRequester RatingStatus?
+  ratingReceiver  RatingStatus?
+  requesterId     Int
+  receiverId      Int
+  user_requester  Users         @relation("Requester", fields: [requesterId], references: [id])
+  user_receiver   Users         @relation("Receiver", fields: [receiverId], references: [id])
+  status          MatchStatus   @default(PENDING)
 }
 
 model Chat {

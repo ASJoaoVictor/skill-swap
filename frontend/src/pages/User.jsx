@@ -89,7 +89,7 @@ const User = () => {
                     }
                     <div className='items-center'>
                         <p>{user.username}</p>
-                        <p className='flex gap-2'><ThumbsUp size={20} className='fill-purple text-purple'/> {user._count.matchesReceived + user._count.matchesRequested }</p>
+                        <p className='flex gap-2'><ThumbsUp size={20} className='fill-purple text-purple'/> {user.like }</p>
                         {/* <p>Membro deste de março de 2026</p> */}
                     </div>
                 </div>

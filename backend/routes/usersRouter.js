@@ -47,20 +47,6 @@ router.get("/get", async (req, res) => {
                         category: true
                     }
                 },
-                _count: {
-                    select: {
-                        matchesReceived: {
-                            where: {
-                                rating: "UP"
-                            }
-                        },
-                        matchesRequested: {
-                            where: {
-                                rating: "UP"
-                            }
-                        }
-                    }
-                }
             },
         });
 

@@ -125,6 +125,7 @@ router.get("/get/accepted", async (req, res) => {
                     {requesterId: currentUser.id}
                 ]
             },
+            distinct: ["requesterId"],
             include: {
                 user_receiver: {
                     include: {
@@ -168,19 +169,65 @@ router.post("/cancel&reject", async (req, res) => {
 });
 
 router.put("/like", async (req, res) => {
-    const { match_id } = req.body;
+    const { match_id, action } = req.body;
+
+    const {user} = req.headers;
+    const currentUser = JSON.parse(user);
+
+    if(!["LIKE", "DESLIKE"].includes(action)){
+        res.status(400).json({message: "Ação inválda"});
+    }
+
+    let newRating;
+    let inc;
+    if(action === "LIKE"){
+        newRating = RatingStatus.UP;
+        inc = 1;
+    }else{
+        newRating = RatingStatus.DOWN;
+        inc = -1;
+    }
     
     try{
-        const match = await prisma.match.update({
-            where: {
-                id: parseInt(match_id),
-            },
-            data: {
-                rating: RatingStatus.UP,
-            }
+        const match = await prisma.match.findUnique({
+            where: {id: parseInt(match_id)}
         })
 
-        res.status(200).json(match);
+        if(!match)
+            res.status(404).json({"message": "match não encontrado!"});
+
+        let field;
+        let userLike;
+        if(match.receiverId === currentUser.id){
+            field = "ratingReceiver";
+            userLike = match.requesterId;
+        }else if(match.requesterId === currentUser.id){
+            field = "ratingRequester";
+            userLike = match.receiverId;
+        }else{
+            res.status(403).json({"message": "Acesso não autorizado."});
+        }
+
+        let rating = match[field] === newRating ? null : newRating;
+
+        const updateMatch = await prisma.match.update({
+            where: {id: parseInt(match_id)},
+            data: {[field]: rating}
+        });
+
+        const updateUser = await prisma.users.update({
+            where: {id: userLike},
+            data: {
+                like: {
+                    increment: inc,
+                }
+            }
+        });
+
+        console.log(updateMatch)
+        console.log(updateUser)
+
+        res.status(200).json(updateMatch);
     }catch(err){
         console.error(err.message);
         res.status(400).json({error: err.message});

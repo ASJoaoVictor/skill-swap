@@ -5,25 +5,27 @@ import CardMatch from "./CardMatch";
 import ChatModal from "./ChatModal";
 import api  from "../services/api";
 
-const CardAccept = ({match, cancelMatch, resfresh}) => {
+const CardAccept = ({match, cancelMatch}) => {
 
     const [contact, setContact] = useState(null);
+    const [rating, setRating] = useState(null);
+    const [isRequester, setIsRequester] = useState(false);
     const [chatOpen, setChatOpen] = useState(false);
-    console.log(match);
-    async function like(){
-        const response = await api.put("/match/like", {
-            match_id: match.id
-        });
-        console.log(response.data);
-        resfresh();
-    };
     
-    async function deslike(){
-        const response = await api.put("/match/deslike", {
-            match_id: match.id
-        });
-        resfresh();
-        console.log(response.data);
+    async function handleRating(action){
+        try{
+            const response = await api.put("/match/like", {
+                match_id: match.id,
+                action: action
+            });
+
+            const updated = response.data;
+            const newRating = isRequester ? updated.ratingRequester : updated.ratingReceiver;
+            setRating(newRating);
+
+        }catch(err){
+            console.log("erro ao avaliar " + err.message);
+        }
     };
 
     useEffect(() => {
@@ -33,12 +35,15 @@ const CardAccept = ({match, cancelMatch, resfresh}) => {
                 const email = response.data.email;
                 if(email === match.user_receiver.email){
                     setContact(match.user_requester);
+                    setRating(match.ratingReceiver);
+                    setIsRequester(false);
                 }else{
-                    console.log(match.user_receiver.skills)
                     setContact(match.user_receiver);
+                    setRating(match.ratingRequester);
+                    setIsRequester(true);
                 }
             }catch(err){
-                console.log("Erro ao verificar usuário" + err);
+                console.log("Erro ao verificar usuário " + err);
             }
         }
         load();
@@ -56,6 +61,7 @@ const CardAccept = ({match, cancelMatch, resfresh}) => {
                         <CircleUserRound size={80} strokeWidth='1' className='text-purple'/>
                     }
                     <p>{contact.username}</p>
+                    <p>{match.id}</p>
                 </div>
                 <button
                     onClick={() => setChatOpen(true)}
@@ -71,9 +77,9 @@ const CardAccept = ({match, cancelMatch, resfresh}) => {
                 <p className="w-full ml-2">Avalie sua interação</p>
                 <div className="flex gap-4">
                     <button
-                        onClick={deslike}
+                        onClick={() => handleRating("DESLIKE")}
                         className={`w-9 h-9 rounded-md border flex items-center justify-center transition bg-light-purple border-green/20
-                            ${match.rating == "DOWN"
+                            ${rating == "DOWN"
                                 ? "bg-red-50 border-red-300 text-red-600"
                                 : "text-gray-300 hover:text-purple hover:border-purple/50"
                             } 
@@ -83,9 +89,9 @@ const CardAccept = ({match, cancelMatch, resfresh}) => {
                         <ThumbsDown size={16}/>
                     </button>
                     <button
-                        onClick={like}
+                        onClick={() => handleRating("LIKE")}
                         className={`w-9 h-9 rounded-md border flex items-center justify-center transition bg-light-purple border-green/20
-                            ${match.rating == "UP"
+                            ${rating == "UP"
                                 ? "bg-green-50 border-green-300 text-green-700"
                                 : "text-gray-300 hover:text-green-500 hover:border-green/50"
                             } 
