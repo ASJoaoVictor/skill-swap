@@ -7,7 +7,7 @@ const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, reload, t
     const [categories, setCategories] = useState([]);
     const [name, setName] = useState(null);
     const [description, setDescription] = useState(null);
-    const [category, setCategory] = useState(null);
+    const [category, setCategory] = useState(0);
 
     useEffect(() => {
         async function load() {
@@ -55,11 +55,8 @@ const ModalAddSkill = ({title, subTitle, descriptionMessage, onCancel, reload, t
 
             <div>
                 <label htmlFor="" className="text-sm text-black font-semibold">Categoria</label><br />
-                <select onChange={(e) => setCategory(e.target.value)} name="" id="" className="w-full h-10 rounded-md bg-gray-200 text-gray-700 p-2" required>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} name="" id="" className="w-full h-10 rounded-md bg-gray-200 text-gray-700 p-2" required>
                     {categories.map((c) =>{
-                        if(c.id === category){
-                            return <option key={c.id} value={c.id} selected>{c.name}</option>
-                        }
                         return <option key={c.id} value={c.id}>{c.name}</option>
                     })}
                 </select>

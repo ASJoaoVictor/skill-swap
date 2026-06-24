@@ -3,6 +3,7 @@ import {RefreshCcw} from "lucide-react";
 import {Link} from "react-router";
 import api from "../services/api";
 import toast, { Toaster } from 'react-hot-toast';
+import GoogleAuth from "../components/GoogleAuth";
 
 const Register  = () => {
     const [name, setName] = useState(null);
@@ -55,12 +56,11 @@ const Register  = () => {
 
                     <button className="bg-purple text-white mt-4 w-60 h-10 rounded-lg cursor-pointer" type="submit">Criar conta</button>
                 </form>
-                <div className="flex justify-center items-center gap-2 h-10 mt-4 border cursor-pointer rounded-md">
-                    <img src="./icon-google.png" alt="" className="w-10" />
-                    <p>Continuar com o google</p>
+                <div className="mt-4">
+                    <GoogleAuth />
                 </div>
             </div>
-            <p className="text-sm">Já tem uma conta? <Link to="/login" className='text-purple font-bold'>Faça login</Link></p>
+            <p className="text-sm">Já tem uma conta? <Link to="/" className='text-purple font-bold'>Faça login</Link></p>
         </div>
     </div>
 };

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://stunning-barnacle-jj75qw6qjq54cp64j-3000.app.github.dev/"
+    baseURL: import.meta.env.VITE_SERVER_URL
 });
 
 api.interceptors.request.use(async config => {

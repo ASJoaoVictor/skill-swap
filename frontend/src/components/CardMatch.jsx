@@ -39,7 +39,7 @@ const CardMatch = ({match}) => {
                         <p>Oferece:</p>
                         <div className="flex flex-wrap w-full gap-2">
                             {match.user_requester.skills.filter((skill) => skill.type === "offered").map((skill) => 
-                                <p className="bg-green-100 border border-green-500 text-green-500 w-fit rounded-md px-2 text-sm">{skill.name}</p>
+                                <p key={skill.id} className="bg-green-100 border border-green-500 text-green-500 w-fit rounded-md px-2 text-sm">{skill.name}</p>
                             )}
                         </div>
                     </div>

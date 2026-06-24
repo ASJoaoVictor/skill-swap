@@ -2,8 +2,9 @@ import { X } from 'lucide-react';
 import ModalAddSkill from './ModalAddSkill';
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 
-const ModalEditSkill = ({skill, onCancel}) => {
+const ModalEditSkill = ({skill, onCancel, reload}) => {
 
     const [name, setName] = useState(skill.name);
     const [category, setCategory] = useState(skill.category.id);
@@ -25,7 +26,21 @@ const ModalEditSkill = ({skill, onCancel}) => {
 
     const handleEditSkill = async (e) => {
         e.preventDefault();
-        console.log(skill.id)
+        try{
+            const response = await api.put("/skill/update", {
+                id: skill.id,
+                name: name,
+                category: category,
+                description: description,
+            });
+
+            onCancel();
+            reload();
+            toast.success("Skill Atualizada!");
+        }catch(err){
+            console.log("Erro ao atualizar skill: " + err.message);
+            toast.error("Tente mais tarde!");
+        }
     }
 
     return <div className="flex justify-center items-center bg-black/20 h-screen w-screen fixed insert-0">

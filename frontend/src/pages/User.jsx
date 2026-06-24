@@ -30,6 +30,19 @@ const User = () => {
         }
     }
 
+    const handleDeleteSkill = async () => {
+        try{
+            const response = await api.delete(`/skill/delete/${skillDelete.id}`)
+
+            setSkillDelete(null);
+            load();
+            toast.success("Deleteda com sucesso!");
+        }catch(err){
+            console.log("Erro ao deletar skill: " + err.message);
+            toast.error("Erro, tente mais tarde!");
+        }
+    }
+
     useEffect(() => {
         load();
     }, []);
@@ -37,12 +50,10 @@ const User = () => {
     if(!user){
         return <LoadingPage />
     }
-
-    console.log(user._count);
-
     
     return <div className='bg-light-purple h-screen'>
         {skillDelete && <ModalConfirm
+            action={handleDeleteSkill}
             title={`Excluir ${skillDelete.name}`}
             message={`Tem certeza que deseja remover esta habilidade? Essa ação não poderá ser desfeita.`}
             onCancel={() => setSkillDelete(null)}
@@ -69,11 +80,13 @@ const User = () => {
         {modalEditSkillOffered && <ModalEditSkill
             skill={modalEditSkillOffered}
             onCancel={() => setModalEditSkillOffered(null)}
+            reload={() => load()}
         />}
 
         {modalEditSkillSought && <ModalEditSkill
             skill={modalEditSkillSought}
             onCancel={() => setModalEditSkillOffered(null)}
+            reload={() => load()}
         />}
 
 
