@@ -39,9 +39,9 @@ router.post("/add", async (req, res) => {
     
 });
 
-router.post("/update/:id", async (req, res) => {
+router.put("/update", async (req, res) => {
     const data = {};
-    const {name, description} = req.body;
+    const {id, name, category, description} = req.body;
     
     if(name){
         data.name = name;
@@ -51,9 +51,17 @@ router.post("/update/:id", async (req, res) => {
         data.description = description;
     }
 
+    if(category){
+        data.category = {
+            connect: {
+                id: parseInt(category)
+            }
+        }
+    }
+
     const updateUser = await prisma.skills.update({
         where: {
-            id: Number(req.params.id),
+            id: Number(id),
         },
         data: data
     });
@@ -61,12 +69,13 @@ router.post("/update/:id", async (req, res) => {
     res.status(202).json({message: "Ok"})
 });
 
-router.post("/delete/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
+    const id  = parseInt(req.params.id);
 
     try{
         const deleteSkill = await prisma.skills.delete({
             where: {
-                id: Number(req.params.id)
+                id: Number(id)
             }
         });
 
