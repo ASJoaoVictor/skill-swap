@@ -17,7 +17,7 @@ model Users {
   email            String    @unique
   url_img          String?
   username         String
-  password         String
+  password         String?
   like             Int?       @default(0)
   secretKey String? @unique
   publicKey String?

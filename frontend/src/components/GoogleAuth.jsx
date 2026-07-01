@@ -1,4 +1,5 @@
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import api from "../services/api";
 
 const GoogleAuth = () => {
     return <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>

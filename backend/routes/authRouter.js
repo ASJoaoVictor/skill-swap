@@ -75,11 +75,11 @@ router.post("/register", async (req, res) => {
             publicKey: user.publicKey,
         };
         
-        const token = jsonwebtoken.sign(
+        const jwtToken = jsonwebtoken.sign(
             {user: JSON.stringify(safeUser)},
             process.env.PRIVATE_KEY,
             { expiresIn: "1h" }
-        )
+        );
 
         return res.status(200).json({user, token});
 
@@ -110,8 +110,9 @@ router.post("/login/google", async (req, res) => {
 
             user = await prisma.users.create({
                 data: {
-                    email: email,
-                    username: name,
+                    email: payload.email,
+                    username: payload.name,
+                    url_img: payload.picture,
                     secretKey: sk,
                     publicKey: pk
                 }
@@ -126,19 +127,20 @@ router.post("/login/google", async (req, res) => {
             publicKey: user.publicKey,
         };
         
-        const jwtToken = jsonwebtoken.sign(
+        token = jsonwebtoken.sign(
             {user: JSON.stringify(safeUser)},
             process.env.PRIVATE_KEY,
             { expiresIn: "1h" }
-        )
+        );
 
-        return res.status(200).json({user, jwtToken});
+        return res.status(200).json({user, token});
 
         
 
 
     }catch(err){
         console.log(err);
+        return res.status(500).json({ message: "Google login failed" });
     }
 });
 

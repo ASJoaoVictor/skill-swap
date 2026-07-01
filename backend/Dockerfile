@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . . 
 
+RUN npx jsr add @nostr/tools
+
 RUN npx prisma generate
 
 EXPOSE 3000
