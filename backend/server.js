@@ -15,6 +15,9 @@ import chatRouter from "./routes/chatRouter.js";
 
 import { prisma } from "./modules/prisma.js";
 
+import { sendDirectMessage } from "./modules/nostr.js";
+import { registerChatSocket } from "./sockets/chatSocket.js";
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -39,65 +42,7 @@ app.get("/", (req, res) => {
     res.send("Hello world!");
 });
 
-io.on("connection", (socket) => {
-    console.log("Usuário conectado: ", socket.id);
-
-    socket.on("join_chat", async (chatId) => {
-        socket.join(chatId);
-
-        try{
-            const messages = await prisma.message.findMany({
-                where: {
-                    chatId: chatId,
-                },
-                orderBy: { createAt: "asc" },
-                take: 50,
-                include: {
-                    sender: {
-                        select: {id: true, username: true}
-                    }
-                }
-            });
-
-            socket.emit("chat_history", messages);
-        }catch(err){
-            console.error("Erro ao buscar histórico:", err.message);
-        }
-    });
-
-    socket.on("send_message", async (data) => {
-        const { chatId, text, senderId } = data;
-
-        io.to(chatId).emit("new_message", {
-            id: Date.now().toString(),
-            chatId,
-            text,
-            senderId: senderId,
-            createAt: new Date().toISOString()
-        });
-
-        const message = await prisma.message.create({
-            data: {
-                text,
-                createAt: new Date().toISOString(),
-                sender: {
-                    connect:{
-                        id: parseInt(senderId)
-                    }
-                },
-                chat: {
-                    connect: {
-                        id: chatId,
-                    }
-                }
-            },
-        });
-    });
-
-    socket.on("disconnect", () => {
-        console.log("Usuário desconectado", socket.id);
-    });
-});
+registerChatSocket(io);
 
 server.listen(port, () => {
     console.log("Server running at: https://localhost:" + port);

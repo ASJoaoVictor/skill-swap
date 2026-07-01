@@ -6,7 +6,7 @@ import api from "../services/api";
 
 const ChatModal = ({ contact, onClose }) => {
     const [messages, setMessages] = useState([]);
-    const [text, setText] = useState("");
+    const [content, setContent] = useState("");
     const [chatId, setChatId] = useState(null);
     const [loading, setLoading] = useState(true);
     const bottomRef = useRef(null);
@@ -50,15 +50,15 @@ const ChatModal = ({ contact, onClose }) => {
     }, [messages]);
 
     const sendMessage = () => {
-        if (!text.trim() || !chatId) return;
+        if (!content.trim() || !chatId) return;
 
         socketRef.current.emit("send_message", {
             chatId,
-            text,
+            content,
             senderId: myId
         });
 
-        setText("");
+        setContent("");
     };
 
     const handleKeyDown = (e) => {
@@ -114,9 +114,9 @@ const ChatModal = ({ contact, onClose }) => {
                                             : "bg-white text-gray-800 shadow rounded-bl-sm"
                                     }`}
                                 >
-                                    {msg.text}
+                                    {msg.content}
                                     <p className={`text-[10px] mt-1 ${isMine ? "text-purple-200" : "text-gray-400"}`}>
-                                        {new Date(msg.createAt).toLocaleTimeString("pt-BR", {
+                                        {new Date(msg.createdAt).toLocaleTimeString("pt-BR", {
                                             hour: "2-digit",
                                             minute: "2-digit"
                                         })}
@@ -131,15 +131,15 @@ const ChatModal = ({ contact, onClose }) => {
                 <div className="flex items-center gap-2 px-4 py-3 border-t bg-white">
                     <input
                         type="text"
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Digite uma mensagem..."
                         className="flex-1 px-4 py-2 rounded-full border border-gray-200 text-sm outline-none focus:border-purple-400 transition"
                     />
                     <button
                         onClick={sendMessage}
-                        disabled={!text.trim()}
+                        disabled={!content.trim()}
                         className="w-10 h-10 rounded-full bg-purple text-white flex items-center justify-center hover:opacity-80 disabled:opacity-40 transition"
                     >
                         <Send size={16} />

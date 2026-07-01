@@ -2,8 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import jsonwebtoken from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import { OAuth2Client } from "google-auth-library"
 import { prisma } from "../modules/prisma.js";
+import { generateNostrIdentity } from "../modules/nostr.js";
 
 const router = express.Router();
 
@@ -21,12 +23,19 @@ router.post("/login", async (req, res) => {
 
         if(!user) return res.status(401).json({ message: "Password or E-mail incorrect" })
         
-        const isMatch = await password === user.password;
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if(!isMatch) return res.status(401).json({ message: "Password or E-mail incorrect" });
 
+        const safeUser = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            publicKey: user.publicKey,
+        };
+
         const token = jsonwebtoken.sign(
-            {user: JSON.stringify(user)},
+            {user: JSON.stringify(safeUser)},
             process.env.PRIVATE_KEY,
             { expiresIn: "1h" }
         )
@@ -44,17 +53,30 @@ router.post("/register", async (req, res) => {
         return res.status(400).json({message: "Dados inválidos!"})
     }
 
+    
     try{
+        const { pubkey, privkeyHex } = generateNostrIdentity();
+        const passwordHash = await bcrypt.hash(password, 10);
+
         const user = await prisma.users.create({
             data: {
                 email: email,
                 username: name,
-                password: password
+                password: passwordHash,
+                secretKey: privkeyHex,
+                publicKey: pubkey
             }
         })
+
+        const safeUser = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            publicKey: user.publicKey,
+        };
         
         const token = jsonwebtoken.sign(
-            {user: JSON.stringify(user)},
+            {user: JSON.stringify(safeUser)},
             process.env.PRIVATE_KEY,
             { expiresIn: "1h" }
         )
@@ -84,24 +106,33 @@ router.post("/login/google", async (req, res) => {
         });
 
         if(!user){
+            const { pk, sk } = generateNostrIdentity();
+
             user = await prisma.users.create({
                 data: {
-                    email: payload.email,
-                    username: `${payload.given_name} ${payload.family_name}`,
-                    url_img: payload.picture,
-                    password: "1234"
+                    email: email,
+                    username: name,
+                    secretKey: sk,
+                    publicKey: pk
                 }
             });
 
         }
 
-        token = jsonwebtoken.sign(
-            {user: JSON.stringify(user)},
+        const safeUser = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            publicKey: user.publicKey,
+        };
+        
+        const jwtToken = jsonwebtoken.sign(
+            {user: JSON.stringify(safeUser)},
             process.env.PRIVATE_KEY,
             { expiresIn: "1h" }
         )
 
-        return res.status(200).json({user, token});
+        return res.status(200).json({user, jwtToken});
 
         
 

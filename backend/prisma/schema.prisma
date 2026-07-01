@@ -18,7 +18,9 @@ model Users {
   url_img          String?
   username         String
   password         String
-  like             Int       @default(0)
+  like             Int?       @default(0)
+  secretKey String? @unique
+  publicKey String?
   skills           Skills[]
   matchesRequested Match[]   @relation("Requester")
   matchesReceived  Match[]   @relation("Receiver")
@@ -73,11 +75,14 @@ model Chat {
 }
 
 model Message {
-  id       String   @id @default(uuid())
-  text     String
-  chat     Chat     @relation(fields: [chatId], references: [id])
-  sender   Users    @relation(fields: [usersId], references: [id])
-  createAt DateTime @default(now())
-  chatId   String
-  usersId  Int
+  id           String   @id @default(uuid())
+  content      String
+  nostrEventId String   @unique
+  createdAt    DateTime @default(now())
+
+  chatId  String
+  usersId Int
+
+  chat   Chat  @relation(fields: [chatId], references: [id])
+  sender Users @relation(fields: [usersId], references: [id])
 }
