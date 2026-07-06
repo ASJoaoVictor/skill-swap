@@ -1,71 +1,73 @@
 // sockets/chatSocket.js
+import jsonwebtoken from "jsonwebtoken";
 import { prisma } from "../modules/prisma.js";
 import { sendDirectMessage } from "../modules/nostr.js";
 
+function getOtherUserId(chatId, currentUserId) {
+    const ids = chatId.split("_").map(Number);
+    return ids.find((id) => id !== currentUserId);
+}
+
 export function registerChatSocket(io) {
+    io.use(async (socket, next) => {
+        try {
+            const token = socket.handshake.auth?.token;
+            if (!token) return next(new Error("Sem token"));
+
+            const payload = jsonwebtoken.verify(token, process.env.PRIVATE_KEY);
+            const safeUser = JSON.parse(payload.user);
+
+            const dbUser = await prisma.users.findUnique({
+                where: { id: safeUser.id }
+            });
+
+            if (!dbUser) return next(new Error("Usuário não encontrado"));
+
+            socket.currentUser = dbUser;
+            next();
+        } catch (err) {
+            next(new Error("Token inválido"));
+        }
+    });
+
     io.on("connection", (socket) => {
-        console.log("Usuário conectado: ", socket.id);
+        console.log("Usuário conectado: ", socket.id, "user:", socket.currentUser.id);
 
-        socket.on("join_chat", async (chatId) => {
+        socket.on("join_chat", (chatId) => {
             socket.join(String(chatId));
-
-            try {
-                const messages = await prisma.message.findMany({
-                    where: { chatId: chatId },
-                    orderBy: { createdAt: "asc" },
-                    take: 50,
-                    include: { sender: { select: { id: true, username: true } } }
-                });
-
-                socket.emit("chat_history", messages);
-            } catch (err) {
-                console.error("Erro ao buscar histórico:", err.message);
-            }
         });
 
         socket.on("send_message", async (data) => {
-            const { chatId, content, senderId } = data;
+            const { chatId, content } = data;
 
             try {
-                const chat = await prisma.chat.findUnique({
-                    where: { id: chatId },
-                    include: { participants: true }
-                });
+                const otherId = getOtherUserId(chatId, socket.currentUser.id);
 
-                if (!chat) {
-                    return socket.emit("error_message", { message: "Chat não encontrado" });
+                if (otherId === undefined) {
+                    return socket.emit("error_message", { message: "Você não participa deste chat" });
                 }
 
-                const sender = chat.participants.find(p => p.id === parseInt(senderId));
-                const recipient = chat.participants.find(p => p.id !== parseInt(senderId));
-
-                if (!sender || !recipient) {
-                    return socket.emit("error_message", { message: "Usuário não participa deste chat" });
-                }
-
-                console.log({
-                    senderId: sender.id,
-                    senderSecretKey: sender.secretKey,
-                    senderPublicKey: sender.publicKey,
-                    recipientPublicKey: recipient.publicKey,
+                const recipient = await prisma.users.findUnique({
+                    where: { id: otherId }
                 });
+
+                if (!recipient) {
+                    return socket.emit("error_message", { message: "Destinatário não encontrado" });
+                }
 
                 const event = await sendDirectMessage({
-                    senderPrivkeyHex: sender.secretKey,
-                    senderPubkey: sender.publicKey,
+                    senderPrivkeyHex: socket.currentUser.secretKey,
+                    senderPubkey: socket.currentUser.publicKey,
                     recipientPubkey: recipient.publicKey,
                     content
                 });
 
-                const message = await prisma.message.create({
-                    data: {
-                        content,
-                        nostrEventId: event.id,
-                        sender: { connect: { id: sender.id } },
-                        chat: { connect: { id: chat.id } }
-                    },
-                    include: { sender: { select: { id: true, username: true } } }
-                });
+                const message = {
+                    id: event.id,
+                    content,
+                    senderId: socket.currentUser.id,
+                    createdAt: new Date(event.created_at * 1000).toISOString()
+                };
 
                 io.to(String(chatId)).emit("new_message", message);
             } catch (err) {

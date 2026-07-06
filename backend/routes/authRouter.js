@@ -106,7 +106,7 @@ router.post("/login/google", async (req, res) => {
         });
 
         if(!user){
-            const { pk, sk } = generateNostrIdentity();
+            const { pubkey, privkeyHex } = generateNostrIdentity();
 
             user = await prisma.users.create({
                 data: {
