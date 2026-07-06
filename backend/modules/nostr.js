@@ -50,6 +50,48 @@ function wrap(rumor, recipientPubkey, senderPrivkeyBytes, senderPubkeyBytes) {
   );
 }
 
+function unwrapGiftWrap(giftWrapEvent, recipientPrivkeyBytes) {
+  try {
+    const wrapKey = nip44.v2.utils.getConversationKey(
+      recipientPrivkeyBytes,
+      giftWrapEvent.pubkey
+    );
+    const seal = JSON.parse(nip44.v2.decrypt(giftWrapEvent.content, wrapKey));
+
+    const sealKey = nip44.v2.utils.getConversationKey(
+      recipientPrivkeyBytes,
+      seal.pubkey
+    );
+    const rumor = JSON.parse(nip44.v2.decrypt(seal.content, sealKey));
+
+    return rumor;
+  } catch (err) {
+    return null;
+  }
+}
+
+// Assina os relays em tempo real: toda vez que chega um gift wrap
+// endereçado a este usuário, decripta e chama onMessage com o rumor.
+// Retorna um objeto com .close() pra encerrar a assinatura.
+export function subscribeToDirectMessages({ userPrivkeyHex, userPubkey, onMessage }) {
+  const userPrivkeyBytes = hexToBytes(userPrivkeyHex);
+  const since = Math.floor(Date.now() / 1000) - 2;
+
+  const sub = pool.subscribeMany(
+    RELAYS,
+    [{ kinds: [1059], "#p": [userPubkey], since }],
+    {
+      onevent(event) {
+        const rumor = unwrapGiftWrap(event, userPrivkeyBytes);
+        if (!rumor || rumor.kind !== 14) return;
+        onMessage(rumor, event);
+      }
+    }
+  );
+
+  return sub;
+}
+
 export async function sendDirectMessage({
   senderPrivkeyHex,
   senderPubkey,

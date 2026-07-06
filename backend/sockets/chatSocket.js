@@ -1,11 +1,10 @@
-// sockets/chatSocket.js
 import jsonwebtoken from "jsonwebtoken";
 import { prisma } from "../modules/prisma.js";
-import { sendDirectMessage } from "../modules/nostr.js";
+import { sendDirectMessage, subscribeToDirectMessages } from "../modules/nostr.js";
 
-function getOtherUserId(chatId, currentUserId) {
-    const ids = chatId.split("_").map(Number);
-    return ids.find((id) => id !== currentUserId);
+function buildChatId(idA, idB) {
+    const [a, b] = [idA, idB].sort((x, y) => x - y);
+    return `${a}_${b}`;
 }
 
 export function registerChatSocket(io) {
@@ -33,6 +32,47 @@ export function registerChatSocket(io) {
     io.on("connection", (socket) => {
         console.log("Usuário conectado: ", socket.id, "user:", socket.currentUser.id);
 
+        // A entrega de verdade acontece aqui: assina os relays e só emite
+        // pro front quando o gift wrap correspondente chega e é decriptado.
+        const subscription = subscribeToDirectMessages({
+            userPrivkeyHex: socket.currentUser.secretKey,
+            userPubkey: socket.currentUser.publicKey,
+            onMessage: async (rumor) => {
+                try {
+                    const recipientTag = rumor.tags.find(([t]) => t === "p");
+                    const recipientPubkey = recipientTag ? recipientTag[1] : null;
+
+                    const otherPubkey =
+                        rumor.pubkey === socket.currentUser.publicKey
+                            ? recipientPubkey
+                            : rumor.pubkey;
+
+                    if (!otherPubkey) return;
+
+                    const otherUser = await prisma.users.findFirst({
+                        where: { publicKey: otherPubkey }
+                    });
+
+                    if (!otherUser) return;
+
+                    const chatId = buildChatId(socket.currentUser.id, otherUser.id);
+
+                    if (!socket.rooms.has(chatId)) return;
+
+                    socket.emit("new_message", {
+                        content: rumor.content,
+                        senderId:
+                            rumor.pubkey === socket.currentUser.publicKey
+                                ? socket.currentUser.id
+                                : otherUser.id,
+                        createdAt: new Date(rumor.created_at * 1000).toISOString()
+                    });
+                } catch (err) {
+                    console.error("Erro ao processar mensagem recebida:", err.message);
+                }
+            }
+        });
+
         socket.on("join_chat", (chatId) => {
             socket.join(String(chatId));
         });
@@ -41,7 +81,8 @@ export function registerChatSocket(io) {
             const { chatId, content } = data;
 
             try {
-                const otherId = getOtherUserId(chatId, socket.currentUser.id);
+                const ids = chatId.split("_").map(Number);
+                const otherId = ids.find((id) => id !== socket.currentUser.id);
 
                 if (otherId === undefined) {
                     return socket.emit("error_message", { message: "Você não participa deste chat" });
@@ -55,21 +96,15 @@ export function registerChatSocket(io) {
                     return socket.emit("error_message", { message: "Destinatário não encontrado" });
                 }
 
-                const event = await sendDirectMessage({
+                // Só publica. Não emite "new_message" aqui — a entrega
+                // acontece via subscription acima, quando o gift wrap
+                // chegar de volta pelos relays.
+                await sendDirectMessage({
                     senderPrivkeyHex: socket.currentUser.secretKey,
                     senderPubkey: socket.currentUser.publicKey,
                     recipientPubkey: recipient.publicKey,
                     content
                 });
-
-                const message = {
-                    id: event.id,
-                    content,
-                    senderId: socket.currentUser.id,
-                    createdAt: new Date(event.created_at * 1000).toISOString()
-                };
-
-                io.to(String(chatId)).emit("new_message", message);
             } catch (err) {
                 console.error("Erro ao enviar mensagem:", err.message);
                 socket.emit("error_message", { message: "Falha ao enviar mensagem" });
@@ -78,6 +113,7 @@ export function registerChatSocket(io) {
 
         socket.on("disconnect", () => {
             console.log("Usuário desconectado", socket.id);
+            subscription?.close();
         });
     });
 }
