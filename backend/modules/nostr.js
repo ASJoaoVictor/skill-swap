@@ -1,3 +1,4 @@
+// backend/modules/nostr.js
 import { generateSecretKey, getPublicKey, finalizeEvent, nip44 } from "nostr-tools";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils.js";
 import { SimplePool } from "nostr-tools/pool";
@@ -77,14 +78,26 @@ export function subscribeToDirectMessages({ userPrivkeyHex, userPubkey, onMessag
   const userPrivkeyBytes = hexToBytes(userPrivkeyHex);
   const since = Math.floor(Date.now() / 1000) - 2;
 
+  console.log("[nostr] abrindo subscription pra pubkey:", userPubkey, "relays:", RELAYS);
+
   const sub = pool.subscribeMany(
     RELAYS,
     [{ kinds: [1059], "#p": [userPubkey], since }],
     {
       onevent(event) {
+        console.log("[nostr] onevent disparado, event id:", event.id);
         const rumor = unwrapGiftWrap(event, userPrivkeyBytes);
-        if (!rumor || rumor.kind !== 14) return;
+        if (!rumor || rumor.kind !== 14) {
+          console.log("[nostr] rumor inválido ou não é kind 14, descartando");
+          return;
+        }
         onMessage(rumor, event);
+      },
+      oneose() {
+        console.log("[nostr] EOSE recebido (fim do histórico inicial)");
+      },
+      onclose(reasons) {
+        console.log("[nostr] subscription fechada:", reasons);
       }
     }
   );
@@ -123,8 +136,64 @@ export async function sendDirectMessage({
     senderPubkeyBytes
   );
 
-  await pool.publish(RELAYS, eventForRecipient);
-  await pool.publish(RELAYS, eventForSender);
+  const resultsRecipient = await Promise.allSettled(pool.publish(RELAYS, eventForRecipient));
+  console.log("[nostr] publish eventForRecipient:", resultsRecipient.map((r, i) => `${RELAYS[i]}: ${r.status}${r.reason ? " - " + r.reason : ""}`));
+
+  const resultsSender = await Promise.allSettled(pool.publish(RELAYS, eventForSender));
+  console.log("[nostr] publish eventForSender:", resultsSender.map((r, i) => `${RELAYS[i]}: ${r.status}${r.reason ? " - " + r.reason : ""}`));
 
   return eventForRecipient;
+}
+
+// Publica uma nota de texto pública (kind 1), equivalente ao
+// EventBuilder.text_note(...) + client.send_event_builder(...) do nostr_sdk (Python).
+export async function publishTextNote({ privkeyHex, content }) {
+  const privkeyBytes = hexToBytes(privkeyHex);
+
+  const event = finalizeEvent(
+    {
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [],
+      content,
+    },
+    privkeyBytes
+  );
+
+  const results = await Promise.allSettled(pool.publish(RELAYS, event));
+  console.log("[nostr] publish textNote:", results.map((r, i) => `${RELAYS[i]}: ${r.status}${r.reason ? " - " + r.reason : ""}`));
+
+  return event;
+}
+
+// backend/modules/nostr.js (adicionar essa função)
+
+// Assina notas de texto públicas (kind 1) de um autor específico.
+// Equivalente ao Filter().author(pubkey).limit(5) + client.handle_notifications(...) do nostr_sdk (Python).
+export function subscribeToTextNotes({ authorPubkey, limit = 5, onEvent }) {
+  console.log("[nostr] abrindo subscription de notas (kind 1) do autor:", authorPubkey);
+
+  const sub = pool.subscribeMany(
+    RELAYS,
+    [{ kinds: [1], authors: [authorPubkey], limit }],
+    {
+      onevent(event) {
+        console.log("\nNOVO EVENTO!");
+        console.log("ID:", event.id);
+        console.log("Autor (Hex):", event.pubkey);
+        console.log("Conteúdo:", event.content);
+        console.log("Timestamp:", event.created_at);
+
+        onEvent?.(event);
+      },
+      oneose() {
+        console.log("[nostr] EOSE recebido (fim do histórico inicial)");
+      },
+      onclose(reasons) {
+        console.log("[nostr] subscription fechada:", reasons);
+      }
+    }
+  );
+
+  return sub;
 }

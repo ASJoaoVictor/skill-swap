@@ -26,22 +26,23 @@ const ChatModal = ({ contact, onClose }) => {
             setChatId(chat.id);
             setLoading(false);
 
-            socketRef.current.emit("join_chat", chat.id);
+            // envia chatId E userId, no formato que o backend espera
+            socketRef.current.emit("join_chat", { chatId: chat.id, userId: myId });
         }
 
         initChat();
-
-        socketRef.current.on("chat_history", (history) => {
-            setMessages(history);
-        });
 
         socketRef.current.on("new_message", (msg) => {
             setMessages((prev) => [...prev, msg]);
         });
 
+        socketRef.current.on("error_message", (err) => {
+            console.log("Erro no chat:", err);
+        });
+
         return () => {
-            socketRef.current.off("chat_history");
             socketRef.current.off("new_message");
+            socketRef.current.off("error_message");
         };
     }, [contact.id]);
 
@@ -100,11 +101,11 @@ const ChatModal = ({ contact, onClose }) => {
                             Nenhuma mensagem ainda. Diga olá! 👋
                         </p>
                     )}
-                    {messages.map((msg) => {
-                        const isMine = parseInt(msg.senderId ?? msg.usersId) === myId;
+                    {messages.map((msg, idx) => {
+                        const isMine = parseInt(msg.sender?.id ?? msg.usersId) === myId;
                         return (
                             <div
-                                key={msg.id}
+                                key={idx}
                                 className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                             >
                                 <div
