@@ -75,7 +75,7 @@ router.post("/register", async (req, res) => {
             publicKey: user.publicKey,
         };
         
-        const jwtToken = jsonwebtoken.sign(
+        const token = jsonwebtoken.sign(
             {user: JSON.stringify(safeUser)},
             process.env.PRIVATE_KEY,
             { expiresIn: "1h" }
