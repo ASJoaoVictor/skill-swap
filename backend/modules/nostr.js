@@ -71,9 +71,6 @@ function unwrapGiftWrap(giftWrapEvent, recipientPrivkeyBytes) {
   }
 }
 
-// Assina os relays em tempo real: toda vez que chega um gift wrap
-// endereçado a este usuário, decripta e chama onMessage com o rumor.
-// Retorna um objeto com .close() pra encerrar a assinatura.
 export function subscribeToDirectMessages({ userPrivkeyHex, userPubkey, onMessage }) {
   const userPrivkeyBytes = hexToBytes(userPrivkeyHex);
   const since = Math.floor(Date.now() / 1000) - 2;
@@ -145,8 +142,6 @@ export async function sendDirectMessage({
   return eventForRecipient;
 }
 
-// Publica uma nota de texto pública (kind 1), equivalente ao
-// EventBuilder.text_note(...) + client.send_event_builder(...) do nostr_sdk (Python).
 export async function publishTextNote({ privkeyHex, content }) {
   const privkeyBytes = hexToBytes(privkeyHex);
 
@@ -166,10 +161,6 @@ export async function publishTextNote({ privkeyHex, content }) {
   return event;
 }
 
-// backend/modules/nostr.js (adicionar essa função)
-
-// Assina notas de texto públicas (kind 1) de um autor específico.
-// Equivalente ao Filter().author(pubkey).limit(5) + client.handle_notifications(...) do nostr_sdk (Python).
 export function subscribeToTextNotes({ authorPubkey, limit = 5, onEvent }) {
   console.log("[nostr] abrindo subscription de notas (kind 1) do autor:", authorPubkey);
 
