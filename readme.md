@@ -82,17 +82,27 @@ Skill Swap é uma plataforma onde pessoas podem trocar conhecimentos entre si: v
    CLIENT_ID=         # Client ID do Google OAuth
    ```
 
-3. Suba os containers
+3. Configure as variáveis de ambiente do frontend
+   ```bash
+   cp frontend/.env.example frontend/.env
+   ```
+   Preencha o arquivo `frontend/.env`:
+   ```
+   VITE_CLIENT_ID=       # Client ID do Google OAuth (mesmo client usado no backend)
+   VITE_SERVER_URL=      # URL do backend (ex.: http://localhost:3000)
+   ```
+
+4. Suba os containers
    ```bash
    docker compose up --build
    ```
 
-4. Rode as migrations do Prisma (dentro do container do backend, se necessário)
+5. Rode as migrations do Prisma (dentro do container do backend, se necessário)
    ```bash
    docker compose exec backend npx prisma migrate deploy
    ```
 
-5. Acesse:
+6. Acesse:
    - Frontend: [http://localhost:5173](http://localhost:5173)
    - Backend: [http://localhost:3000](http://localhost:3000)
 
@@ -112,8 +122,6 @@ cd frontend
 npm install
 npm run dev
 ```
-
-Lembre-se de criar um arquivo `.env` no frontend com a variável `VITE_SERVER_URL` apontando para o backend (ex.: `http://localhost:3000`).
 
 ## 📄 Licença
 
