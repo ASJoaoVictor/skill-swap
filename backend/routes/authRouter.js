@@ -113,8 +113,8 @@ router.post("/login/google", async (req, res) => {
                     email: payload.email,
                     username: payload.name,
                     url_img: payload.picture,
-                    secretKey: sk,
-                    publicKey: pk
+                    secretKey: privkeyHex,
+                    publicKey: pubkey
                 }
             });
 

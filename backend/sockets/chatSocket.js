@@ -1,8 +1,6 @@
-// backend/sockets/chatSocket.js
 import { prisma } from "../modules/prisma.js";
 import { sendDirectMessage, subscribeToDirectMessages } from "../modules/nostr.js";
 
-// guarda a subscription Nostr ativa de cada socket
 const activeSubs = new Map();
 
 export function registerChatSocket(io) {
@@ -29,10 +27,8 @@ export function registerChatSocket(io) {
                     return socket.emit("error_message", { message: "Usuário não participa deste chat" });
                 }
 
-                // fecha subscription anterior desse socket (ex: trocou de contato)
                 activeSubs.get(socket.id)?.close();
 
-                // assina só mensagens que chegarem DAQUI PRA FRENTE (sem histórico)
                 const sub = subscribeToDirectMessages({
                     userPrivkeyHex: me.secretKey,
                     userPubkey: me.publicKey,
@@ -86,7 +82,6 @@ export function registerChatSocket(io) {
                     content
                 });
 
-                // emite pro remetente na hora (o destinatário recebe via subscription, se estiver online)
                 io.to(String(chatId)).emit("new_message", {
                     content,
                     createdAt: new Date(event.created_at * 1000),

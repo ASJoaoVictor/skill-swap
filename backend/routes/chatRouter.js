@@ -8,7 +8,6 @@ const router = express.Router();
 
 router.use(tokenValited);
 
-// Lista todos os chats do usuário logado, com os participantes
 router.get("/", async (req, res) => {
     const { user } = req.headers;
     const currentUser = JSON.parse(user);
@@ -31,7 +30,6 @@ router.get("/", async (req, res) => {
     }
 });
 
-// Cria (ou retorna, se já existir) o chat entre o usuário logado e outro usuário
 router.post("/", async (req, res) => {
     const { user } = req.headers;
     const currentUser = JSON.parse(user);
@@ -67,8 +65,6 @@ router.post("/", async (req, res) => {
     }
 });
 
-// Busca o histórico de mensagens do chat direto nos relays Nostr (não há persistência no banco).
-// Abre uma subscription temporária, coleta os eventos até o EOSE (fim do backlog) ou timeout, e fecha.
 router.get("/:chatId/messages", async (req, res) => {
     const { user } = req.headers;
     const currentUser = JSON.parse(user);
@@ -91,7 +87,6 @@ router.get("/:chatId/messages", async (req, res) => {
             return res.status(403).json({ message: "Você não participa deste chat" });
         }
 
-        // precisa da secretKey, que não vem no token (safeUser não a inclui)
         const me = await prisma.users.findUnique({ where: { id: currentUser.id } });
 
         const messages = await new Promise((resolve) => {
@@ -119,7 +114,6 @@ router.get("/:chatId/messages", async (req, res) => {
                 }
             });
 
-            // dá um tempo pros relays devolverem o backlog, depois fecha e resolve
             const timeout = setTimeout(() => {
                 sub.close();
                 collected.sort((a, b) => a.createdAt - b.createdAt);
@@ -134,7 +128,6 @@ router.get("/:chatId/messages", async (req, res) => {
     }
 });
 
-// Envia uma mensagem no chat (criptografada via Nostr NIP-17, sem persistir no banco)
 router.post("/:chatId/messages", async (req, res) => {
     const { user } = req.headers;
     const currentUser = JSON.parse(user);
